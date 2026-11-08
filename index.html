@@ -59,7 +59,7 @@ body{
   height:100%;display:flex;flex-direction:column;box-sizing:border-box;
   padding-left:max(16px, env(safe-area-inset-left,0px));
   padding-right:max(16px, env(safe-area-inset-right,0px));
-  padding-top:calc(10px + env(safe-area-inset-top,0px));padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));max-width:760px;margin:0 auto;
+  padding-top:calc(10px + env(safe-area-inset-top,0px));padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));max-width:min(1200px,100%);margin:0 auto;
   position:fixed;top:0;bottom:0;left:0;right:0;height:auto;
 }
 header{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;gap:8px}
@@ -231,6 +231,70 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
 .ed-row .btn[aria-pressed="true"]{background:var(--coral);color:#2a0a0e}
 .pets{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
 .shelf{position:static;width:100%;max-width:100%;height:86px;display:block;border-radius:14px}
+/* title screen */
+#titleOv{background:radial-gradient(120% 80% at 50% 30%,rgba(12,33,36,.35),rgba(6,16,18,.88));backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.title-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:360px;text-align:center}
+.logo{font:400 clamp(52px,15vw,84px)/.95 var(--display);color:var(--brass);text-shadow:0 5px 0 #8a5c10,0 14px 30px rgba(0,0,0,.45);letter-spacing:.01em;margin:0;animation:float 3.2s ease-in-out infinite}
+.logo-sub{font:800 15px var(--body);color:var(--text);opacity:.85;margin:0}
+.logo-tag{font:900 11px var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--leaf);margin:0}
+.title-btns{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:8px}
+.title-bottles{display:flex;gap:14px;align-items:flex-end;height:96px}
+.tb{width:26px;border-radius:6px 6px 14px 14px;border:2px solid rgba(214,242,242,.6);display:flex;flex-direction:column-reverse;overflow:hidden;padding:2px;gap:0;animation:float 2.6s ease-in-out infinite}
+.tb i{display:block;height:18px}
+.tb:nth-child(2){animation-delay:.3s}.tb:nth-child(3){animation-delay:.6s}.tb:nth-child(4){animation-delay:.9s}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+/* dialogue */
+#talkOv{place-items:end center;background:rgba(6,18,20,.45);backdrop-filter:none;-webkit-backdrop-filter:none}
+.talk{box-sizing:border-box;width:100%;max-width:560px;background:linear-gradient(180deg,var(--ink-3),var(--ink-2));border-radius:24px;padding:16px;display:grid;grid-template-columns:84px 1fr;gap:14px;align-items:start;box-shadow:0 20px 50px rgba(0,0,0,.5),inset 0 0 0 1.5px rgba(242,184,75,.35);cursor:pointer;animation:pop .35s cubic-bezier(.2,1.4,.4,1)}
+.talk canvas{position:static;width:84px;height:84px;border-radius:18px;background:rgba(0,0,0,.2)}
+.talk b{display:block;font:400 19px var(--display);color:var(--brass)}
+.talk p{margin:4px 0 0;font:700 16px/1.4 var(--body);color:var(--text);min-height:44px}
+.talk .talk-foot{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;font:800 12px var(--body);color:var(--muted)}
+.talk .talk-foot button{border:none;background:rgba(205,234,236,.08);color:var(--muted);font:800 12px var(--body);border-radius:999px;padding:6px 12px;cursor:pointer}
+/* story map */
+.chap{display:flex;flex-direction:column;gap:10px}
+.chap-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.chap-h b{font:400 20px var(--display);color:var(--text)}
+.chap-h span{font:800 12px var(--body);color:var(--muted)}
+.nodes{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.node{aspect-ratio:1;max-width:100%;border:none;border-radius:50%;background:rgba(205,234,236,.08);color:var(--text);font:400 17px var(--display);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.node .s{font:900 8px var(--body);color:var(--brass);letter-spacing:1px;height:10px}
+.node.cur{background:linear-gradient(180deg,var(--brass),var(--brass-deep));color:var(--brass-ink)}
+.node.cur .s{color:var(--brass-ink)}
+.node.boss{box-shadow:inset 0 0 0 2px var(--coral)}
+.node:disabled{opacity:.3;cursor:default}
+.node:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+/* short landscape screens (phones turned sideways) */
+@media (max-height:520px){
+  #app{padding-block:6px 8px}
+  .icon-btn{width:40px;height:40px;border-radius:12px}
+  header{grid-template-columns:42px 1fr 42px}
+  .title{display:flex;align-items:baseline;justify-content:center;gap:10px}
+  .title b{font-size:28px;margin-top:0}
+  .meta{margin-top:4px;min-height:0}
+  .chip{font-size:11px;padding:3px 8px}
+  #tip{display:none}
+  .toolbar{padding-top:4px}
+  .tool{flex-direction:row;justify-content:center;padding:7px 8px;gap:6px;max-width:150px}
+  .tool svg{width:20px;height:20px}
+  .badge{top:-6px;right:-4px}
+  .title-bottles{display:none}
+  .logo{font-size:48px}
+}
+/* tablets and big screens */
+@media (min-width:700px) and (min-height:700px){
+  .title b{font-size:54px}
+  .title small{font-size:13px}
+  .chip{font-size:14px;padding:5px 12px}
+  #tip{font-size:17px}
+  .icon-btn{width:54px;height:54px}
+  header{grid-template-columns:56px 1fr 56px}
+  .tool{max-width:150px;font-size:14px;padding:12px 4px 10px}
+  .tool svg{width:28px;height:28px}
+  .card{max-width:420px}
+  .menu-card{max-width:620px}
+}
+@media (prefers-reduced-motion:reduce){.logo,.tb{animation:none}}
 @media (prefers-reduced-motion:reduce){.card{animation:none}.stars svg{transition:none}#toast{transition:none}}
 </style>
 
@@ -289,6 +353,44 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
       <button class="btn primary" id="stTube">Añadir tubo extra</button>
       <button class="btn ghost" id="stRestart">Reiniciar nivel</button>
     </div>
+  </div>
+</div>
+
+<div class="overlay" id="titleOv">
+  <div class="title-wrap">
+    <div class="title-bottles" aria-hidden="true">
+      <span class="tb"><i style="background:#ff4d5e"></i><i style="background:#ff4d5e"></i><i style="background:#ff4d5e"></i><i style="background:#ff4d5e"></i></span>
+      <span class="tb"><i style="background:#ffd23f"></i><i style="background:#4cc3ff"></i><i style="background:#ffd23f"></i><i style="background:#4cc3ff"></i></span>
+      <span class="tb"><i style="background:#a6e35a"></i><i style="background:#a6e35a"></i><i style="background:#a6e35a"></i><i style="background:#a6e35a"></i></span>
+      <span class="tb"><i style="background:#9b5cff"></i><i style="background:#ff70cf"></i><i style="background:#9b5cff"></i></span>
+    </div>
+    <h1 class="logo">Trasvase</h1>
+    <p class="logo-sub">Ordena los colores, un frasco cada vez</p>
+    <p class="logo-tag">Sin anuncios · Sin compras</p>
+    <div class="title-btns">
+      <button class="btn primary" id="tPlay">Jugar</button>
+      <button class="btn ghost" id="tStory">Modo historia</button>
+      <button class="btn ghost" id="tDaily">Reto diario</button>
+      <button class="btn ghost" id="tModes">Más modos</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="talkOv" hidden>
+  <div class="talk" id="talkBox" role="dialog" aria-live="polite" aria-labelledby="talkName">
+    <canvas id="talkPic" width="168" height="168"></canvas>
+    <div><b id="talkName"></b><p id="talkText"></p></div>
+    <div class="talk-foot"><span>Toca para continuar</span><button id="talkSkip">Saltar</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="storyOv" hidden>
+  <div class="card menu-card" role="dialog" aria-labelledby="storyTitle">
+    <div class="menu-head">
+      <h2 id="storyTitle">Modo historia</h2>
+      <button class="icon-btn" id="storyClose" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="panel" id="storyPanel"></div>
   </div>
 </div>
 
@@ -356,6 +458,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
         <h3>Ajustes</h3>
         <div class="row"><div>Sonido</div><button class="switch" role="switch" id="swSound" aria-label="Sonido"></button></div>
         <div class="row"><div>Música<small>Melodía suave que cambia con cada mundo</small></div><button class="switch" role="switch" id="swMusic" aria-label="Música"></button></div>
+        <div class="row"><div>Efectos de fondo<small>Desactívalos para ahorrar batería en móviles antiguos</small></div><button class="switch" role="switch" id="swAmb" aria-label="Efectos de fondo"></button></div>
         <div class="row"><div>Vibración<small>Solo en móviles que la admiten</small></div><button class="switch" role="switch" id="swVib" aria-label="Vibración"></button></div>
         <div class="row"><div>Modo daltónico<small>Cada color lleva un símbolo</small></div><button class="switch" role="switch" id="swCb" aria-label="Modo daltónico"></button></div>
       </div>
@@ -373,7 +476,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
         <button class="btn ghost small" id="btnCopyCode">Copiar mi código</button>
         <p class="savemsg" id="saveMsg" aria-live="polite"></p>
       </div>
-      <p class="sub" style="text-align:center">Trasvase · versión 8</p>
+      <p class="sub" style="text-align:center">Trasvase · versión 9</p>
     </div>
   </div>
 </div>
@@ -505,6 +608,7 @@ const MECH={
   twins:{name:'Gemelas',intro:43,tip:'Al verter de una gemela, la otra también vierte si su color encaja'}
 };
 const MECH_ORDER=['collector','ice','count','sizes','lock','rainbow','tap','twins'];
+let DISPLAY_FONT="'Bagel Fat One','Trebuchet MS',system-ui,sans-serif";
 const RIBBONS=['#ff6fa8','#ffb347','#7fe8da'];
 
 let COLORS=PALETTES.original.c.slice(),LIGHT=[];
@@ -516,8 +620,10 @@ function colHex(c){return c===RB?'#ffffff':COLORS[c]||'#888888';}
 
 /* ================= save ================= */
 let save={unlocked:1,current:1,stars:{},muted:false,drops:5,vib:true,cb:false,skin:'auto',palette:'original',theme:'auto',cork:'corcho',fx:'chispas',snd:'clasico',
-  owned:{},shields:0,gift:'',music:true,pet:'gotita',petsSeen:1,rushBest:0,zenCount:0,edit:null,stats:{},ach:{},daily:{last:'',streak:0,best:0,count:0},inprog:null,inprogDaily:null,world:0};
+  owned:{},shields:0,gift:'',music:true,ambient:!matchMedia('(prefers-reduced-motion: reduce)').matches,story:{max:0,stars:{}},pet:'gotita',petsSeen:1,rushBest:0,zenCount:0,edit:null,stats:{},ach:{},daily:{last:'',streak:0,best:0,count:0},inprog:null,inprogDaily:null,world:0};
 function fixSave(){
+  save.story=save.story||{max:0,stars:{}};save.story.stars=save.story.stars||{};save.story.seen=save.story.seen||{};
+  if(save.ambient===undefined)save.ambient=true;
   save.stats=save.stats||{};save.ach=save.ach||{};save.owned=save.owned||{};
   save.daily=Object.assign({last:'',streak:0,best:0,count:0},save.daily||{});
   // whatever is equipped counts as owned (older saves unlocked things with stars)
@@ -608,6 +714,24 @@ function zenSpec(i){return{L:20,colors:4+(i%4),mechs:[],boss:false,breather:true
 let RUSH={active:false,left:180,solved:0,seed:1};
 function rushSpec(i){return{L:10,colors:Math.min(7,3+Math.floor(i/2)),mechs:[],boss:false,breather:false,hiddenP:0,seed:900000+RUSH.seed*1013+i*7919,sets:2};}
 function customSpec(d){const cols=new Set();(d&&d.tubes||[]).forEach(t=>t.forEach(c=>cols.add(c)));return{L:20,colors:cols.size,mechs:[],boss:false,breather:false,hiddenP:0,seed:1,sets:2};}
+const STORY_CHAPTERS=[
+  {name:'El desorden del Barón',world:0},
+  {name:'El laboratorio helado',world:1},
+  {name:'Las mareas de colores',world:2},
+  {name:'La coleccionista de estrellas',world:3}
+];
+const STORY_MECHS=[
+  [[],[],[],[],['collector'],[],['collector'],[],['collector'],['collector']],
+  [['ice'],['ice'],['ice'],[],['count'],['count'],['sizes'],['sizes'],['ice'],['sizes','ice','count']],
+  [['lock'],['lock'],['lock'],['rainbow'],['rainbow'],['tap'],['tap'],['tap'],['lock'],['tap','lock']],
+  [['twins'],['twins'],['twins'],[],['collector'],['twins'],['twins'],['rainbow'],['ice'],['twins','collector']]
+];
+const STORY_LEN=40;
+function storySpec(i){
+  const ch=Math.floor(i/10),st=i%10,boss=st===9;
+  const base=[3,5,6,7][ch],colors=Math.min(12,base+Math.floor(st/(ch?4:3))+(boss?1:0));
+  return{L:10+ch*12,colors,mechs:STORY_MECHS[ch][st].slice(),boss,breather:false,hiddenP:0,seed:300000+i*7919,sets:2,story:i};
+}
 function difficultyName(c){return c<=4?'Fácil':c<=6?'Medio':c<=9?'Difícil':'Experto';}
 
 /* ================= solver (all level types) =================
@@ -827,7 +951,7 @@ function levelData(){
 }
 function loadLevel(L,data,mode){
   S.mode=mode||'level';
-  S.spec=S.mode==='daily'?dailySpec():S.mode==='zen'?zenSpec(L):S.mode==='rush'?rushSpec(L):S.mode==='custom'?customSpec(data):levelSpec(L);
+  S.spec=S.mode==='daily'?dailySpec():S.mode==='story'?storySpec(L):S.mode==='zen'?zenSpec(L):S.mode==='rush'?rushSpec(L):S.mode==='custom'?customSpec(data):levelSpec(L);
   S.level=L;
   const d=data||generate(S.spec);
   const n0=d.tubes.length,fill=(arr,v)=>arr&&arr.length===n0?arr:Array(n0).fill(v);
@@ -853,7 +977,7 @@ function bootLevel(){
   else loadLevel(L,null,'level');
 }
 function saveProgress(){
-  if(S.done||S.mode==='zen'||S.mode==='rush'||S.mode==='custom')return;
+  if(S.done||S.mode==='zen'||S.mode==='rush'||S.mode==='custom'||S.mode==='story')return;
   const data=JSON.parse(JSON.stringify(levelData()));
   if(S.mode==='daily')save.inprogDaily={day:S.spec.daily,data};
   else save.inprog={key:'L'+S.level,data};
@@ -863,7 +987,7 @@ function saveProgress(){
 /* ----- worlds & look ----- */
 let curWorld=0,amb=[],curAmb='dust',musicKey='botica';
 function applyWorld(){
-  const w=S.mode==='daily'?dayIndex()%WORLDS.length:S.mode==='level'?worldOf(S.level):worldOf(save.current||1);
+  const w=S.mode==='daily'?dayIndex()%WORLDS.length:S.mode==='level'?worldOf(S.level):S.mode==='story'?STORY_CHAPTERS[Math.floor(S.level/10)].world:worldOf(save.current||1);
   curWorld=w;const W0=WORLDS[w];const r=document.documentElement.style;
   const ev=activeEvent();
   const T=save.theme!=='auto'&&THEMES[save.theme]?THEMES[save.theme]:ev?THEMES[ev.id]:W0;
@@ -885,12 +1009,13 @@ function renderHeader(){
   if(S.mode==='daily'){
     $('lvlLabel').textContent='Reto diario';
     $('lvlNum').textContent=new Date().toLocaleDateString('es-ES',{day:'numeric',month:'short'}).replace('.','');
-  }else if(S.mode==='zen'){$('lvlLabel').textContent='Modo zen';$('lvlNum').textContent=save.zenCount+1;h+='<span class="chip breath">Sin prisa ni estrellas</span>';}
+  }else if(S.mode==='story'){const ch=Math.floor(S.level/10);$('lvlLabel').textContent='Capítulo '+(ch+1)+' · '+STORY_CHAPTERS[ch].name;$('lvlNum').textContent=(ch+1)+'-'+(S.level%10+1);}
+  else if(S.mode==='zen'){$('lvlLabel').textContent='Modo zen';$('lvlNum').textContent=save.zenCount+1;h+='<span class="chip breath">Sin prisa ni estrellas</span>';}
   else if(S.mode==='rush'){$('lvlLabel').textContent='Contrarreloj · '+RUSH.solved+(RUSH.solved===1?' resuelto':' resueltos');$('lvlNum').textContent=fmtTime(RUSH.left);}
   else if(S.mode==='custom'){$('lvlLabel').textContent=customFriend?'Puzle de un amigo':'Tu puzle';$('lvlNum').textContent='Editor';}
   else{$('lvlLabel').textContent='Nivel · '+WORLDS[curWorld].name;$('lvlNum').textContent=S.level;}
   if(ev&&S.mode==='level')h+='<span class="chip type">'+ev.name+'</span>';
-  if(S.mode!=='level'&&S.mode!=='daily'){
+  if(S.mode!=='level'&&S.mode!=='daily'&&S.mode!=='story'){
     h+='<span class="chip drops" id="dropsChip" title="Gotas">'+DROP_SVG+'<b id="dropsNum">'+save.drops+'</b></span>';
     $('meta').innerHTML=h;updateTools();return;
   }
@@ -928,6 +1053,8 @@ function updateTools(){
   if(S.mode==='level'&&S.level===1&&S.moves===0)tip='Toca un tubo y luego otro para trasvasar';
   else if(S.mode==='level'&&S.level===1&&S.moves<3)tip='Solo cae sobre el mismo color o en un tubo vacío';
   else if(S.mode==='level'&&S.level===2&&S.moves===0)tip='Las gotas pagan pistas y ayudas. Ganas una por cada estrella nueva';
+  else if(S.mode==='story'&&S.moves<2&&S.mechs.find(m=>m!=='count'))tip=MECH[S.mechs.find(m=>m!=='count')].tip;
+  else if(S.mode==='story'&&S.limit&&S.moves===0)tip='Hazlo en '+S.limit+' trasvases o menos para no perder estrella';
   else if(S.mode==='zen'&&S.moves===0)tip='Respira hondo. Aquí no hay prisa: pistas gratis y deshacer sin límite';
   else if(S.mode==='rush'&&S.moves===0)tip='¡Rápido! Resuelve todos los que puedas antes de que acabe el tiempo';
   else if(S.mode==='custom'&&S.moves===0)tip=customFriend?'Puzle creado por un amigo':'Prueba tu propio puzle';
@@ -961,11 +1088,12 @@ const ASP=4.3;
 let W=0,H=0,DPR=1,G={w:40,L:172,Lb:170,r:12,br:12,nw:24,neckH:10,shY:29,segH:30},pos=[];
 function layout(){
   const r=stage.getBoundingClientRect();W=r.width;H=r.height;
-  DPR=Math.min(window.devicePixelRatio||1,2.5);
+  DPR=Math.min(window.devicePixelRatio||1,2);
   cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
   const N=S.tubes.length;if(!N||!W||!H)return;
   const reg=[],col=[];for(let i=0;i<N;i++)(S.only[i]>=0?col:reg).push(i);
-  const sideW=col.length?Math.min(W*.17,86):0,RW=W-2*sideW,n=reg.length;
+  const big=Math.max(1,Math.min(1.9,Math.min(W,H)/420));
+  const sideW=col.length?Math.min(W*.17,86*big):0,RW=W-2*sideW,n=reg.length;
   let best=null;
   for(let rows=1;rows<=4;rows++){
     const cols=Math.ceil(n/rows);if(rows>1&&Math.ceil(n/(rows-1))<=3)continue;
@@ -974,7 +1102,7 @@ function layout(){
     let L=w*ASP;
     const need=rows*L+(rows-1)*L*.36+L*.46;
     if(need>H){const s=H/need;w*=s;L*=s;}
-    w=Math.min(w,62);if(col.length)w=Math.min(w,sideW*.8);
+    w=Math.min(w,62*big);if(col.length)w=Math.min(w,sideW*.8);
     if(!best||w>best.w+.5)best={rows,cols,w};
   }
   const sh=SHAPES[curShape()];
@@ -1123,7 +1251,7 @@ function drawTube(i,tx,layers,now,isSel){
         }
         const yb=Math.min(low,tx.y+Lb),hgt=yb-up;
         if(l.hid){
-          ctx.fillStyle='#6f9a9a';ctx.font=Math.round(segH*.5)+'px '+getComputedStyle(document.body).getPropertyValue('--display');
+          ctx.fillStyle='#6f9a9a';ctx.font=Math.round(segH*.5)+'px '+DISPLAY_FONT;
           ctx.textAlign='center';ctx.textBaseline='middle';
           ctx.fillText('?',x,(up+yb)/2+eh*.4);
         }else if(save.cb&&hgt>segH*.55){
@@ -1346,6 +1474,7 @@ function drawRibbons(txs){
   });
 }
 function drawAmbient(now){
+  if(!save.ambient)return;
   const kind=curAmb;
   ctx.save();
   if(kind==='xmas'){
@@ -1586,7 +1715,7 @@ function frame(){
   ctx.globalAlpha=1;
   particles=particles.filter(p=>p.type==='confetti'?p.y<H+30:p.life<p.max);
   floats=floats.filter(f=>now-f.t0<1.4);
-  floats.forEach(f=>{const t=(now-f.t0)/1.4;ctx.globalAlpha=1-t*t;ctx.font='400 '+Math.round(G.w*.5+8)+'px '+getComputedStyle(document.body).getPropertyValue('--display');ctx.textAlign='center';ctx.textBaseline='middle';
+  floats.forEach(f=>{const t=(now-f.t0)/1.4;ctx.globalAlpha=1-t*t;ctx.font='400 '+Math.round(G.w*.5+8)+'px '+DISPLAY_FONT;ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.lineWidth=4;ctx.strokeStyle='rgba(0,0,0,.45)';ctx.strokeText(f.text,clamp(f.x,60,W-60),f.y-t*40);ctx.fillStyle=f.col;ctx.fillText(f.text,clamp(f.x,60,W-60),f.y-t*40);});
   ctx.globalAlpha=1;
   requestAnimationFrame(frame);
@@ -1631,6 +1760,7 @@ addAch('Modos',[[10,'zen10','Calma',3],[50,'zen50','Nirvana',8],[200,'zen200','M
 addAch('Modos',[[5,'ru5','Rápido',3],[10,'ru10','Frenético',6],[20,'ru20','A contrarreloj',12]],g=>'Resuelve '+g+' puzles en una partida de contrarreloj',()=>save.rushBest||0,'clock');
 [['ed1','Arquitecto','ownSolved','Crea y resuelve tu propio puzle',3,'flask'],['cp1','Retador','codesCopied','Copia el código de un puzle para compartirlo',2,'share'],['fr1','Buen amigo','friendSolved','Resuelve el puzle de un amigo',3,'link']]
  .forEach(([id,name,k,desc,r,ic])=>ACH.push({cat:'Modos',id,name,desc,goal:1,val:st(k),r,ic}));
+[['sc1','Aprendiz de Albahaca',10,3],['sc2','Ayudante de Volta',20,5],['sc3','Grumete de Marea',30,8],['sc4','Maestra alquimista',40,15]].forEach(([id,name,goal,r])=>ACH.push({cat:'Modos',id,name,desc:goal===40?'Termina el modo historia':'Termina el capítulo '+(goal/10),goal,val:()=>Object.keys(save.story.stars).length,r,ic:'flask'}));
 addAch('Colección',[[3,'pet3','Cuidador',3],[6,'pet6','Criador',6],[12,'pet12','Zoo completo',15]],g=>'Consigue '+g+' mascotas',()=>petsUnlocked(),'gift');
 EVENTS.forEach(e=>{
   ACH.push({cat:'Eventos',ev:e.id,id:'ev_'+e.id+'10',name:e.name+' I',desc:'Supera 10 niveles durante el evento '+e.name,goal:10,val:st('ev_'+e.id),r:5,ic:'star'});
@@ -1741,6 +1871,17 @@ function checkWin(){
     }else rewards.push('Ya lo habías superado hoy: vuelve mañana para seguir la racha');
     save.inprogDaily=null;
     title='¡Reto del día superado!';nextLabel='Volver a los niveles';
+  }else if(S.mode==='story'){
+    const key=String(S.level),prev=save.story.stars[key]||0;
+    const gained=Math.max(0,stars-prev);
+    if(gained){save.drops+=gained;rewards.push('+'+gained+(gained>1?' gotas':' gota')+' por estrellas nuevas');}
+    if(S.spec.boss&&!prev){save.drops+=5;stat('storyBosses');rewards.push('+5 gotas por vencer al jefe del capítulo');}
+    if(S.comboDrops)rewards.push('+'+S.comboDrops+' de combos');
+    save.story.stars[key]=Math.max(prev,stars);
+    save.story.max=Math.max(save.story.max||0,Math.min(STORY_LEN-1,S.level+1));
+    if(S.level===STORY_LEN-1&&!prev)save.story.finished=1;
+    title=S.spec.boss?'¡Jefe derrotado!':'¡Puzle '+(Math.floor(S.level/10)+1)+'-'+(S.level%10+1)+' listo!';
+    nextLabel=S.level===STORY_LEN-1?'Ver el final':'Continuar la historia';
   }else{
     const key=String(S.level),prev=save.stars[key]||0;
     const gained=Math.max(0,stars-prev);
@@ -1894,6 +2035,7 @@ $('btnReveal').onclick=()=>{
 $('btnNext').onclick=()=>{
   $('winOv').hidden=true;
   if(S.mode==='custom'){openEditor();return;}
+  if(S.mode==='story'){storyAfter(S.level);return;}
   if(S.mode==='daily'||S.mode==='rush'){RUSH.active=false;bootLevel();}
   else loadLevel(S.level+1,null,'level');
 };
@@ -2108,6 +2250,7 @@ function syncSwitches(){
   $('swVib').setAttribute('aria-checked',String(!!save.vib));
   $('swCb').setAttribute('aria-checked',String(!!save.cb));
   $('swMusic').setAttribute('aria-checked',String(!!save.music));
+  $('swAmb').setAttribute('aria-checked',String(!!save.ambient));
 }
 function renderMore(){
   syncSwitches();
@@ -2121,6 +2264,7 @@ function renderMore(){
 }
 $('swSound').onclick=()=>setMuted(!save.muted);
 $('swVib').onclick=()=>{save.vib=!save.vib;persist();syncSwitches();vib(30);};
+$('swAmb').onclick=()=>{save.ambient=!save.ambient;persist();syncSwitches();};
 $('swMusic').onclick=()=>{save.music=!save.music;persist();syncSwitches();if(save.music){sfx.unlock();music.start();}else music.stop();};
 $('swCb').onclick=()=>{save.cb=!save.cb;persist();syncSwitches();};
 
@@ -2145,6 +2289,131 @@ $('btnLoadCode').onclick=()=>{
   persist();$('codeIn').value='';
   $('saveMsg').textContent='Progreso recuperado: hasta el nivel '+save.unlocked;
 };
+
+/* ================= story mode ================= */
+const CHARS={
+  lia:{name:'Lía'},
+  albahaca:{name:'Maestra Albahaca'},
+  grumo:{name:'Barón Grumo',pet:{kind:'slime',col:'#7bc043',need:1},acc:'tophat'},
+  volta:{name:'Doctora Volta',pet:{kind:'robot',col:'#9fb8c0',need:2},acc:'goggles'},
+  marea:{name:'Capitán Marea',pet:{kind:'octopus',col:'#ff70cf',need:3},acc:'pirate'},
+  nebula:{name:'Nébula',pet:{kind:'star',col:'#b48cff',need:4},acc:'crown'}
+};
+const STORY_BEFORE={
+  0:[['albahaca','¡Lía! Alguien ha revuelto todas las pociones de la botica.'],['lia','¿Todas? ¡Si ayer las dejé ordenadas por colores!'],['albahaca','Pues vuelve a ordenarlas. Un color por frasco, como te enseñé.'],['lia','¡Manos a la obra!']],
+  4:[['albahaca','Mira esas botellas grandes de los lados. Solo aceptan su color.'],['albahaca','Llénalas hasta arriba y no podrás sacar nada de ellas.'],['lia','Entendido: todo el color, a su botella.']],
+  9:[['grumo','¡Ja! Soy el Barón Grumo, y me encanta el desorden.'],['grumo','Cada poción mezclada es una obra de arte mía.'],['lia','Pues a mí me encanta ordenar. ¡Prepárate!']],
+  10:[['volta','Bienvenida a mi laboratorio. Todo aquí está bajo control… y congelado.'],['lia','¡Has helado los tubos!'],['volta','Completa colores y el hielo se derretirá. Si eres capaz.']],
+  14:[['volta','Aquí medimos cada trasvase. Ni uno de más.'],['lia','Pensaré antes de verter. Prometido.']],
+  19:[['volta','Mi experimento final: tubos de tamaños imposibles.'],['lia','Cuatro capas por color. Eso no cambia, sea cual sea el tubo.']],
+  20:[['marea','¡Arr! Los colores del mar ahora son míos, grumete.'],['lia','¡Devuélvelos ahora mismo!'],['marea','Primero tendrás que abrir mis candados.']],
+  23:[['lia','¿Un líquido arcoíris? Encaja con cualquier color…'],['albahaca','…y se disuelve al tocarlo. Úsalo para ganar espacio.']],
+  25:[['marea','Mis grifos vierten desde abajo. ¡Nadie los domina!'],['lia','Entonces miraré el fondo del tubo, no la superficie.']],
+  29:[['marea','¡Todos a cubierta! Grifos y candados a la vez.'],['lia','Ya he aprendido de los dos. ¡Allá voy!']],
+  30:[['nebula','Quiero todos los colores del universo en un solo frasco.'],['lia','¡Pero entonces todo sería de un color gris!'],['nebula','…Nunca lo había pensado.']],
+  34:[['grumo','Lía… perdona por el lío de la botica.'],['grumo','Solo quería que alguien se fijara en mis mezclas.'],['lia','Ayúdame a ordenar esto y te enseño a hacer pociones de verdad.']],
+  39:[['nebula','Demuéstrame que el orden es más bonito que la mezcla.'],['lia','Mira bien. Cada color en su sitio brilla más.']]
+};
+const STORY_AFTER={
+  9:[['grumo','¡Imposible! Mis mezclas eran perfectas…'],['albahaca','El Barón ha huido hacia el laboratorio de la Doctora Volta.'],['lia','¡Voy tras él!']],
+  19:[['volta','Fascinante. Tu método es… eficiente.'],['volta','El Barón escapó en un barco. Rumbo al océano.']],
+  29:[['marea','Me rindo, grumete. Te devuelvo los colores.'],['marea','El Barón trabaja para alguien que vive entre las estrellas.']],
+  39:[['nebula','Es precioso… cada color en su sitio brilla más.'],['albahaca','Ya no eres una aprendiz, Lía. Eres maestra alquimista.'],['grumo','¿Podemos ir todos a la botica? Prometo no mezclar nada.'],['lia','¡Claro! Allí siempre habrá un frasco para cada uno.']]
+};
+function fixStory(){save.story=save.story||{max:0,stars:{}};save.story.stars=save.story.stars||{};save.story.seen=save.story.seen||{};}
+let talkQ=null,talkI=0,talkDone=null;
+function talk(lines,done){
+  if(!lines||!lines.length){done&&done();return;}
+  talkQ=lines;talkI=0;talkDone=done;$('talkOv').hidden=false;showTalk();
+}
+function showTalk(){
+  const[who,text]=talkQ[talkI];
+  $('talkName').textContent=CHARS[who].name;$('talkText').textContent=text;
+  const c=$('talkPic'),g2=c.getContext('2d');g2.setTransform(2,0,0,2,0,0);g2.clearRect(0,0,84,84);
+  drawCharacter(who,g2);sfx.pick();
+}
+function nextTalk(){if(!talkQ)return;talkI++;if(talkI>=talkQ.length)endTalk();else showTalk();}
+function endTalk(){$('talkOv').hidden=true;const d=talkDone;talkQ=null;talkDone=null;d&&d();}
+$('talkBox').onclick=e=>{if(e.target.id==='talkSkip')return;nextTalk();};
+$('talkSkip').onclick=e=>{e.stopPropagation();endTalk();};
+function drawCharacter(id,g2){
+  const oc=ctx;ctx=g2;
+  try{
+    const C=CHARS[id],now=performance.now()/1000;
+    if(C.pet){
+      drawPet(C.pet,42,50,20,now,'idle',false);
+      const s=20;ctx.save();ctx.translate(42,50);
+      if(C.acc==='tophat'){ctx.fillStyle='#1d1d24';ctx.beginPath();rr(-s*.45,-s*1.55,s*.9,s*.72,s*.08);ctx.fill();ctx.fillRect(-s*.75,-s*.88,s*1.5,s*.16);ctx.fillStyle='#d0283c';ctx.fillRect(-s*.45,-s*1.05,s*.9,s*.15);
+        ctx.strokeStyle='#ffd23f';ctx.lineWidth=2;ctx.beginPath();ctx.arc(s*.28,0,s*.24,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(s*.5,s*.08);ctx.quadraticCurveTo(s*.7,s*.5,s*.55,s*.75);ctx.stroke();}
+      if(C.acc==='goggles'){ctx.fillStyle='#ff9a2e';ctx.fillRect(-s*.8,-s*.62,s*1.6,s*.18);[-.3,.3].forEach(d=>{ctx.fillStyle='#ffd23f';ctx.beginPath();ctx.arc(d*s,-s*.53,s*.2,0,7);ctx.fill();ctx.fillStyle='#9fe3ff';ctx.beginPath();ctx.arc(d*s,-s*.53,s*.13,0,7);ctx.fill();});}
+      if(C.acc==='pirate'){ctx.fillStyle='#1d1d24';ctx.beginPath();ctx.moveTo(-s*.95,-s*.55);ctx.quadraticCurveTo(0,-s*1.05,s*.95,-s*.55);ctx.quadraticCurveTo(s*.4,-s*1.5,0,-s*1.35);ctx.quadraticCurveTo(-s*.4,-s*1.5,-s*.95,-s*.55);ctx.fill();
+        ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(0,-s*.95,s*.13,0,7);ctx.fill();}
+      if(C.acc==='crown'){ctx.fillStyle='#ffd23f';const y=-s*.95;ctx.beginPath();ctx.moveTo(-s*.45,y);ctx.lineTo(-s*.45,y-s*.4);ctx.lineTo(-s*.22,y-s*.18);ctx.lineTo(0,y-s*.5);ctx.lineTo(s*.22,y-s*.18);ctx.lineTo(s*.45,y-s*.4);ctx.lineTo(s*.45,y);ctx.closePath();ctx.fill();}
+      ctx.restore();
+    }else if(id==='lia'){
+      ctx.fillStyle='#f4f7f8';ctx.beginPath();ctx.ellipse(42,92,30,20,0,0,7);ctx.fill();
+      ctx.fillStyle='#6b3e1f';ctx.beginPath();ctx.arc(66,40,9,0,7);ctx.fill();
+      ctx.fillStyle='#f6cfa8';ctx.beginPath();ctx.arc(42,48,23,0,7);ctx.fill();
+      ctx.fillStyle='#6b3e1f';ctx.beginPath();ctx.arc(42,45,25,Math.PI*1.02,Math.PI*1.98);ctx.quadraticCurveTo(52,36,40,38);ctx.quadraticCurveTo(28,40,17,46);ctx.closePath();ctx.fill();
+      ctx.fillStyle='#ff4d5e';ctx.beginPath();ctx.arc(62,36,3.5,0,7);ctx.fill();
+      [[33,29],[51,29]].forEach(([x,y])=>{ctx.fillStyle='#ffd23f';ctx.beginPath();ctx.arc(x,y,7.5,0,7);ctx.fill();ctx.fillStyle='#9fe3ff';ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.fill();});
+      ctx.fillStyle='#2a1a10';[[34,51],[50,51]].forEach(([x,y])=>{ctx.beginPath();ctx.ellipse(x,y,3,4,0,0,7);ctx.fill();});
+      ctx.fillStyle='#ffffff';[[35,49.5],[51,49.5]].forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,1.2,0,7);ctx.fill();});
+      ctx.fillStyle='rgba(255,120,150,.45)';[[28,58],[56,58]].forEach(([x,y])=>{ctx.beginPath();ctx.ellipse(x,y,4,2.5,0,0,7);ctx.fill();});
+      ctx.strokeStyle='#7a3a2a';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.arc(42,58,5,.15*Math.PI,.85*Math.PI);ctx.stroke();
+    }else if(id==='albahaca'){
+      ctx.fillStyle='#7b4bc4';ctx.beginPath();ctx.ellipse(42,94,32,22,0,0,7);ctx.fill();
+      ctx.fillStyle='#d9dde2';[[22,52],[62,52]].forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,9,0,7);ctx.fill();});
+      ctx.fillStyle='#eac3a0';ctx.beginPath();ctx.arc(42,52,21,0,7);ctx.fill();
+      ctx.fillStyle='#5b2fa0';ctx.beginPath();ctx.ellipse(42,35,32,6,0,0,7);ctx.fill();
+      ctx.beginPath();ctx.moveTo(22,35);ctx.lineTo(62,35);ctx.lineTo(50,2);ctx.quadraticCurveTo(46,10,22,35);ctx.fill();
+      ctx.fillStyle='#ffd23f';ctx.fillRect(25,29,34,4);
+      ctx.strokeStyle='#3a2a1a';ctx.lineWidth=1.6;[[34,52],[50,52]].forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,6,0,7);ctx.stroke();});ctx.beginPath();ctx.moveTo(40,52);ctx.lineTo(44,52);ctx.stroke();
+      ctx.fillStyle='#2a1a10';[[34,52],[50,52]].forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,2,0,7);ctx.fill();});
+      ctx.strokeStyle='#7a3a2a';ctx.lineWidth=2;ctx.lineCap='round';ctx.beginPath();ctx.arc(42,60,5,.15*Math.PI,.85*Math.PI);ctx.stroke();
+    }
+  }finally{ctx=oc;}
+}
+function storyPlay(i){
+  fixStory();RUSH.active=false;
+  $('storyOv').hidden=true;$('menuOv').hidden=true;$('winOv').hidden=true;
+  loadLevel(i,null,'story');
+  if(STORY_BEFORE[i]&&!save.story.seen['b'+i]){save.story.seen['b'+i]=1;persist();talk(STORY_BEFORE[i]);}
+}
+function storyAfter(i){
+  fixStory();
+  const go=()=>{if(i>=STORY_LEN-1){openStory();toast('¡Historia completada!','Lía ya es maestra alquimista');}else storyPlay(i+1);};
+  if(STORY_AFTER[i]&&!save.story.seen['a'+i]){save.story.seen['a'+i]=1;persist();talk(STORY_AFTER[i],go);}else go();
+}
+function openStory(){fixStory();$('menuOv').hidden=true;$('storyOv').hidden=false;renderStory();}
+function renderStory(){
+  fixStory();
+  const max=save.story.max||0,total=Object.values(save.story.stars).reduce((a,b)=>a+b,0);
+  let h='<p class="sub">Acompaña a Lía, aprendiz de alquimista, a devolver el orden a los cuatro mundos. '+total+' de '+(STORY_LEN*3)+' estrellas.</p>';
+  h+='<button class="btn primary" id="storyGo">'+(save.story.finished?'Volver a jugar el final':max===0&&!save.story.stars['0']?'Empezar la historia':'Continuar · '+(Math.floor(max/10)+1)+'-'+(max%10+1))+'</button>';
+  STORY_CHAPTERS.forEach((c,ch)=>{
+    const got=[...Array(10).keys()].reduce((a,k)=>a+(save.story.stars[ch*10+k]||0),0);
+    h+='<div class="box chap"><div class="chap-h"><b>'+(ch+1)+'. '+c.name+'</b><span>'+WORLDS[c.world].name+' · '+got+'/30 ★</span></div><div class="nodes">';
+    for(let k=0;k<10;k++){const i=ch*10+k,stars=save.story.stars[i]||0,locked=i>max,boss=k===9;
+      h+='<button class="node'+(i===max&&!save.story.finished?' cur':'')+(boss?' boss':'')+'" data-i="'+i+'"'+(locked?' disabled aria-label="Bloqueado"':' aria-label="Puzle '+(ch+1)+'-'+(k+1)+(boss?', jefe':'')+'"')+'>'+(boss?'<svg viewBox="0 0 24 16" width="20" height="14"><path d="M2 14h20l-2-11-5 5-3-7-3 7-5-5z" fill="currentColor"/></svg>':(k+1))+'<span class="s">'+'★'.repeat(stars)+'</span></button>';}
+    h+='</div></div>';
+  });
+  $('storyPanel').innerHTML=h;
+  $('storyGo').onclick=()=>storyPlay(save.story.finished?STORY_LEN-1:max);
+  $('storyPanel').querySelectorAll('.node').forEach(b=>b.onclick=()=>storyPlay(+b.dataset.i));
+}
+$('storyClose').onclick=()=>{$('storyOv').hidden=true;};
+
+/* ================= title screen ================= */
+function showTitle(){
+  $('tPlay').textContent='Jugar · Nivel '+Math.min(save.current||1,save.unlocked);
+  $('titleOv').hidden=false;
+}
+function hideTitle(){$('titleOv').hidden=true;sfx.unlock();}
+$('tPlay').onclick=()=>{hideTitle();if(S.mode!=='level')bootLevel();};
+$('tStory').onclick=()=>{hideTitle();openStory();};
+$('tDaily').onclick=()=>{hideTitle();openMenu('daily');};
+$('tModes').onclick=()=>{hideTitle();openMenu('modes');};
 
 /* ================= zen & time attack ================= */
 function fmtTime(t){t=Math.max(0,Math.ceil(t));return Math.floor(t/60)+':'+String(t%60).padStart(2,'0');}
@@ -2310,12 +2579,14 @@ function renderModes(){
   const ev=activeEvent();
   let h='';
   if(ev)h+='<div class="box"><div class="mode-card"><div class="flame" style="background:rgba(155,92,255,.18);color:var(--grape)"><svg viewBox="0 0 24 24">'+ICONS.star+'</svg></div><div><h3>Evento: '+ev.name+'</h3><p class="sub">'+ev.blurb+' Quedan '+eventDaysLeft(ev)+' días. El fondo del evento ya está puesto, tienes artículos especiales en la tienda y logros propios.</p></div></div></div>';
+  fixStory();
+  h+='<div class="box"><div class="mode-card"><div class="flame" style="background:rgba(242,184,75,.16);color:var(--brass)"><svg viewBox="0 0 24 24">'+ICONS.flask+'</svg></div><div><h3>Modo historia</h3><p class="sub">Lía, aprendiz de alquimista, contra el Barón Grumo y compañía. 4 capítulos y 40 puzles con jefes.</p></div></div><button class="btn primary" id="mStory">'+(save.story.max||save.story.stars['0']?'Continuar la historia':'Empezar la historia')+'</button></div>';
   h+='<div class="box"><div class="mode-card"><div class="flame" style="background:rgba(166,227,90,.14);color:var(--leaf)"><svg viewBox="0 0 24 24">'+ICONS.moon+'</svg></div><div><h3>Modo zen</h3><p class="sub">Puzles tranquilos uno detrás de otro, sin estrellas ni contador. Pistas gratis. Llevas '+(save.zenCount||0)+'.</p></div></div><button class="btn primary" id="mZen">Jugar en zen</button></div>';
   h+='<div class="box"><div class="mode-card"><div class="flame"><svg viewBox="0 0 24 24">'+ICONS.clock+'</svg></div><div><h3>Contrarreloj</h3><p class="sub">Resuelve todos los puzles que puedas en 3 minutos. Ganas una gota por puzle (hasta 15). Récord: '+(save.rushBest||0)+'.</p></div></div><button class="btn primary" id="mRush">Empezar (3 min)</button></div>';
   h+='<div class="box"><div class="mode-card"><div class="flame" style="background:rgba(76,195,255,.14);color:var(--water)"><svg viewBox="0 0 24 24">'+ICONS.flask+'</svg></div><div><h3>Editor de niveles</h3><p class="sub">Diseña tus puzles, compruébalos y comparte el código con tus amigos.</p></div></div><button class="btn primary" id="mEdit">Abrir el editor</button>'+
     '<div class="savebox"><label for="mCode">Código de un amigo</label><div class="saverow"><input id="mCode" type="text" autocomplete="off" spellcheck="false" placeholder="TRV2-…"><button class="btn ghost small" id="mCodePlay">Jugar</button></div><p class="savemsg" id="mMsg" aria-live="polite"></p></div></div>';
   $('p-modes').innerHTML=h;
-  $('mZen').onclick=startZen;$('mRush').onclick=startRush;$('mEdit').onclick=openEditor;
+  $('mStory').onclick=openStory;$('mZen').onclick=startZen;$('mRush').onclick=startRush;$('mEdit').onclick=openEditor;
   $('mCodePlay').onclick=()=>{let t;try{t=decodePuzzle($('mCode').value);}catch(e){$('mMsg').textContent='Ese código no es válido. Revisa que esté completo.';return;}checkAndPlay(t,true,m=>{$('mMsg').textContent=m;});};
 }
 function renderColl(){
@@ -2391,7 +2662,8 @@ const sfx=(()=>{
 
 /* Android back button: close whatever is open first */
 window.trasvaseBack=function(){
-  for(const id of ['menuOv','stuckOv']){const el=$(id);if(!el.hidden){el.hidden=true;return true;}}
+  if(!$('talkOv').hidden){endTalk();return true;}
+  for(const id of ['menuOv','stuckOv','storyOv','editOv']){const el=$(id);if(!el.hidden){el.hidden=true;return true;}}
   if(selected>=0){selected=-1;return true;}
   return false;
 };
@@ -2440,8 +2712,9 @@ const music=(()=>{
 /* ================= boot ================= */
 function start(data){
   loadSave();applyPalette();
-  if(data&&data.mode&&data.data&&data.data.tubes)loadLevel(data.level,data.data,data.mode);
-  else bootLevel();
+  try{const f=getComputedStyle(document.documentElement).getPropertyValue('--display').trim();if(f)DISPLAY_FONT=f;}catch(e){}
+  if(data&&data.mode&&data.data&&data.data.tubes){$('titleOv').hidden=true;loadLevel(data.level,data.data,data.mode);}
+  else{bootLevel();showTitle();}
   requestAnimationFrame(frame);
   cloudInit(false);
   setTimeout(checkAch,1200);
