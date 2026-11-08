@@ -504,7 +504,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
         <button class="btn ghost small" id="btnCopyCode">Copiar mi código</button>
         <p class="savemsg" id="saveMsg" aria-live="polite"></p>
       </div>
-      <p class="sub" style="text-align:center">Trasvase · versión 13</p>
+      <p class="sub" style="text-align:center">Trasvase · versión 14</p>
     </div>
   </div>
 </div>
@@ -1022,6 +1022,8 @@ function applyWorld(){
   musicKey=save.theme!=='auto'&&THEME_MUSIC[save.theme]?THEME_MUSIC[save.theme]:ev?ev.id:['botica','laboratorio','oceano','espacio'][w];
   curAmb=T.amb;
   r.setProperty('--bg1',T.bg[0]);r.setProperty('--bg2',T.bg[1]);r.setProperty('--bg3',T.bg[2]);
+  // tint the phone's status bar with the colour at the top of the background
+  try{let m=document.querySelector('meta[name="theme-color"]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m);}m.content=mix(T.bg[1],T.bg[2],.35).replace(/rgb\((\d+),(\d+),(\d+)\)/,(x,a,b,c)=>'#'+[a,b,c].map(v=>(+v).toString(16).padStart(2,'0')).join(''));}catch(e){}
   const rnd=mulberry32(w*17+3);amb=[];for(let k=0;k<34;k++)amb.push({x:rnd(),y:rnd(),s:rnd(),p:rnd()*6.28});
   if(S.mode==='level'&&w!==save.world&&S.level>1){save.world=w;toast('Mundo '+(w+1)+': '+W0.name,'Nuevo ambiente y nueva botella');}
   else if(S.mode==='level')save.world=w;
