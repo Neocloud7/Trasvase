@@ -56,7 +56,7 @@ body{
   -webkit-tap-highlight-color:transparent;
 }
 #app{
-  height:100%;display:flex;flex-direction:column;box-sizing:border-box;
+  position:relative;z-index:1;height:100%;display:flex;flex-direction:column;box-sizing:border-box;
   padding-left:max(16px, env(safe-area-inset-left,0px));
   padding-right:max(16px, env(safe-area-inset-right,0px));
   padding-top:calc(10px + env(safe-area-inset-top,0px));padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));max-width:min(1200px,100%);margin:0 auto;
@@ -85,8 +85,10 @@ header{display:grid;grid-template-columns:48px 1fr 48px;align-items:center;gap:8
 .chip.drops svg{width:12px;height:12px}
 #tip{text-align:center;color:var(--muted);font-weight:700;font-size:14px;min-height:20px;margin-top:6px;text-wrap:balance}
 #tip.flash{color:var(--brass)}
-#stage{flex:1;min-height:0;position:relative}
+#stage{flex:1;min-height:0;position:relative;touch-action:none}
 canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+/* the game canvas covers the whole screen; tubes are laid out inside #stage */
+#cv{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 .toolbar{display:flex;justify-content:center;gap:8px;padding-top:8px}
 .tool{
   flex:1;min-width:0;max-width:104px;border:none;border-radius:18px;padding:10px 2px 8px;cursor:pointer;
@@ -502,7 +504,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
         <button class="btn ghost small" id="btnCopyCode">Copiar mi código</button>
         <p class="savemsg" id="saveMsg" aria-live="polite"></p>
       </div>
-      <p class="sub" style="text-align:center">Trasvase · versión 12</p>
+      <p class="sub" style="text-align:center">Trasvase · versión 13</p>
     </div>
   </div>
 </div>
@@ -1113,13 +1115,14 @@ function vib(p){if(!save.vib)return;try{navigator.vibrate&&navigator.vibrate(p);
 const ASP=4.3;
 let W=0,H=0,DPR=1,G={w:40,L:172,Lb:170,r:12,br:12,nw:24,neckH:10,shY:29,segH:30},pos=[];
 function layout(){
-  const r=stage.getBoundingClientRect();W=r.width;H=r.height;
+  const cr=cv.getBoundingClientRect(),r=stage.getBoundingClientRect();W=cr.width;H=cr.height;
   DPR=Math.min(window.devicePixelRatio||1,2);
   cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
-  const N=S.tubes.length;if(!N||!W||!H)return;
+  const SX=r.left-cr.left,SY=r.top-cr.top,SW=r.width,SH=r.height;
+  const N=S.tubes.length;if(!N||!W||!H||!SW||!SH)return;
   const reg=[],col=[];for(let i=0;i<N;i++)(S.only[i]>=0?col:reg).push(i);
-  const big=Math.max(1,Math.min(1.9,Math.min(W,H)/420));
-  const sideW=col.length?Math.min(W*.17,86*big):0,RW=W-2*sideW,n=reg.length;
+  const big=Math.max(1,Math.min(1.9,Math.min(SW,SH)/420));
+  const sideW=col.length?Math.min(SW*.17,86*big):0,RW=SW-2*sideW,n=reg.length;
   let best=null;
   for(let rows=1;rows<=4;rows++){
     const cols=Math.ceil(n/rows);if(rows>1&&Math.ceil(n/(rows-1))<=3)continue;
@@ -1127,7 +1130,7 @@ function layout(){
     let w=RW/(cols+(cols-1)*.5+.3);
     let L=w*ASP;
     const need=rows*L+(rows-1)*L*.36+L*.46;
-    if(need>H){const s=H/need;w*=s;L*=s;}
+    if(need>SH){const s=SH/need;w*=s;L*=s;}
     w=Math.min(w,62*big);if(col.length)w=Math.min(w,sideW*.8);
     if(!best||w>best.w+.5)best={rows,cols,w};
   }
@@ -1137,10 +1140,10 @@ function layout(){
   const rows=best.rows,per=[];let left=n;
   for(let i=0;i<rows;i++){const c=Math.ceil(left/(rows-i));per.push(c);left-=c;}
   const rowGap=L*.36,blockH=rows*L+(rows-1)*rowGap;
-  let y=Math.max(L*.34,(H-blockH)/2+L*.1);const top=y;
+  let y=SY+Math.max(L*.34,(SH-blockH)/2+L*.1);const top=y;
   pos=[];geom=[];let k=0;
   per.forEach(c=>{
-    const gap=Math.min(w*.62,(RW-c*w)/(c+1));const rowW=c*w+(c-1)*gap;let x=sideW+(RW-rowW)/2+w/2;
+    const gap=Math.min(w*.62,(RW-c*w)/(c+1));const rowW=c*w+(c-1)*gap;let x=SX+sideW+(RW-rowW)/2+w/2;
     for(let j=0;j<c;j++){
       const i=reg[k++];
       if(S.cap[i]!==CAP){const d=(S.cap[i]-CAP)*G.segH;geom[i]=Object.assign({},G,{L:L+d,Lb:Lb+d});pos[i]={x,y:y-d};}
@@ -1150,7 +1153,7 @@ function layout(){
     y+=L+rowGap;
   });
   col.forEach((i,ci)=>{
-    pos[i]={x:ci===0?sideW/2:W-sideW/2,y:top};
+    pos[i]={x:ci===0?SX+sideW/2:SX+SW-sideW/2,y:top};
     const Lc=blockH,Lbc=Lc-2*(br*br/3)/w;
     geom[i]=Object.assign({},G,{L:Lc,Lb:Lbc,segH:(Lbc-pad)/S.cap[i]});
   });
@@ -1959,7 +1962,7 @@ $('stTube').onclick=()=>{$('stuckOv').hidden=true;$('btnTube').click();};
 $('stRestart').onclick=()=>{$('stuckOv').hidden=true;$('btnRestart').click();};
 
 /* ================= input ================= */
-cv.addEventListener('pointerdown',e=>{
+stage.addEventListener('pointerdown',e=>{
   sfx.unlock();
   if(S.done)return;
   const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
