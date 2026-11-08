@@ -341,11 +341,31 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
 @keyframes shine{to{transform:translateX(130%)}}
 .spark{position:fixed;width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:60;animation:spark .55s cubic-bezier(.2,.8,.3,1) forwards}
 @keyframes spark{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+/* band under the phone's status bar, in the page's base colour */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg3);z-index:2;pointer-events:none}
 /* panel contents keep their size and the panel scrolls instead */
 .panel>*{flex-shrink:0}
 @media (prefers-reduced-motion:reduce){.logo,.tb{animation:none}}
 @media (prefers-reduced-motion:reduce){.card{animation:none}.stars svg{transition:none}#toast{transition:none}}
 </style>
+<script>
+/* Pick this player's background before anything is drawn, so the phone's status bar samples the right colour. */
+(function(){
+  try{
+    var W=[['#18454c','#10292d','#0c2124'],['#1f3b58','#14263c','#0c1827'],['#0f4c6e','#0a304a','#061c2f'],['#3b2763','#1e1439','#0d0a1f']];
+    var T={botica:W[0],laboratorio:W[1],oceano:W[2],espacio:W[3],atardecer:['#6b2d4a','#3a1830','#1c0b19'],bosque:['#22502f','#14321d','#0a1c10'],nieve:['#3d5878','#23364d','#121c2b'],volcan:['#5e2214','#30100a','#170705'],aurora:['#163b4c','#0e2238','#090f1f'],
+      halloween:['#3b1f4c','#1f1029','#0f0814'],navidad:['#1b4a39','#0f2a21','#08150f'],primavera:['#3f5b3d','#263d26','#132213'],verano:['#1d6a8a','#0f4561','#082a3d']};
+    var E=[['halloween',1015,1115],['navidad',1201,107],['primavera',320,515],['verano',621,915]];
+    var sv={};try{sv=JSON.parse(localStorage.getItem('trasvase-v1')||'{}')||{};}catch(e){}
+    var d=new Date(),t=(d.getMonth()+1)*100+d.getDate(),ev=null;
+    E.forEach(function(e){if(e[1]<=e[2]?(t>=e[1]&&t<=e[2]):(t>=e[1]||t<=e[2]))ev=e[0];});
+    var L=Math.max(1,Math.min(sv.current||1,sv.unlocked||1));
+    var bg=(sv.theme&&sv.theme!=='auto'&&T[sv.theme])||(ev&&T[ev])||W[Math.floor((L-1)/20)%4];
+    var r=document.documentElement.style;r.setProperty('--bg1',bg[0]);r.setProperty('--bg2',bg[1]);r.setProperty('--bg3',bg[2]);
+    var m=document.querySelector('meta[name="theme-color"]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m);}m.content=bg[2];
+  }catch(e){}
+})();
+</script>
 
 </head>
 <body>
@@ -526,7 +546,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
         <button class="btn ghost small" id="btnCopyCode">Copiar mi código</button>
         <p class="savemsg" id="saveMsg" aria-live="polite"></p>
       </div>
-      <p class="sub" style="text-align:center">Trasvase · versión 16</p>
+      <p class="sub" style="text-align:center">Trasvase · versión 17</p>
     </div>
   </div>
 </div>
@@ -1045,7 +1065,7 @@ function applyWorld(){
   curAmb=T.amb;
   r.setProperty('--bg1',T.bg[0]);r.setProperty('--bg2',T.bg[1]);r.setProperty('--bg3',T.bg[2]);
   // tint the phone's status bar with the colour at the top of the background
-  try{let m=document.querySelector('meta[name="theme-color"]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m);}m.content=mix(T.bg[1],T.bg[2],.35).replace(/rgb\((\d+),(\d+),(\d+)\)/,(x,a,b,c)=>'#'+[a,b,c].map(v=>(+v).toString(16).padStart(2,'0')).join(''));}catch(e){}
+  try{let m=document.querySelector('meta[name="theme-color"]');if(!m){m=document.createElement('meta');m.name='theme-color';document.head.appendChild(m);}m.content=T.bg[2];}catch(e){}
   const rnd=mulberry32(w*17+3);amb=[];for(let k=0;k<34;k++)amb.push({x:rnd(),y:rnd(),s:rnd(),p:rnd()*6.28});
   if(S.mode==='level'&&w!==save.world&&S.level>1){save.world=w;toast('Mundo '+(w+1)+': '+W0.name,'Nuevo ambiente y nueva botella');}
   else if(S.mode==='level')save.world=w;
