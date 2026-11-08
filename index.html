@@ -21,11 +21,26 @@ img{max-width:100%}
 [hidden]{display:none!important}
 /* installed on the home screen: draw under the status bar and size everything to the full screen height */
 html.standalone,html.standalone body{height:100vh;overflow:hidden}
-html.standalone #app,html.standalone .overlay{bottom:auto;height:100vh}
-html.standalone #cv{height:100vh}
+html.standalone #app,html.standalone .overlay{bottom:auto;height:var(--app-h,100vh)}
+html.standalone #cv{height:var(--app-h,100vh)}
 </style>
 <script>
-(function(){var s=navigator.standalone||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;if(s)document.documentElement.classList.add('standalone');})();
+(function(){
+  var d=document.documentElement;
+  var s=navigator.standalone||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;
+  if(!s)return;
+  d.classList.add('standalone');
+  // iOS reports one height too short and another too tall here: use the smaller of 100vh and the physical screen
+  function fit(){
+    var probe=document.createElement('div');probe.style.cssText='position:fixed;top:0;height:100vh;width:1px;visibility:hidden';
+    (document.body||d).appendChild(probe);var vh=probe.offsetHeight;probe.remove();
+    var portrait=innerHeight>=innerWidth,sw=screen.width,sh=screen.height;
+    var full=portrait?Math.max(sw,sh):Math.min(sw,sh);
+    var h=Math.min(vh||full,full);
+    d.style.setProperty('--app-h',h+'px');
+  }
+  fit();addEventListener('DOMContentLoaded',fit);addEventListener('resize',fit);addEventListener('orientationchange',function(){setTimeout(fit,300);});
+})();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -511,7 +526,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
         <button class="btn ghost small" id="btnCopyCode">Copiar mi código</button>
         <p class="savemsg" id="saveMsg" aria-live="polite"></p>
       </div>
-      <p class="sub" style="text-align:center">Trasvase · versión 15</p>
+      <p class="sub" style="text-align:center">Trasvase · versión 16</p>
     </div>
   </div>
 </div>
