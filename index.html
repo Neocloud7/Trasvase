@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#0c2124">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Trasvase">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -19,7 +19,14 @@ html,body{margin:0;overscroll-behavior:none}
 body{font:14px/1.4 system-ui,-apple-system,'Segoe UI',sans-serif}
 img{max-width:100%}
 [hidden]{display:none!important}
+/* installed on the home screen: draw under the status bar and size everything to the full screen height */
+html.standalone,html.standalone body{height:100vh;overflow:hidden}
+html.standalone #app,html.standalone .overlay{bottom:auto;height:100vh}
+html.standalone #cv{height:100vh}
 </style>
+<script>
+(function(){var s=navigator.standalone||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;if(s)document.documentElement.classList.add('standalone');})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Nunito:wght@600;800;900&display=swap">
@@ -504,7 +511,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
         <button class="btn ghost small" id="btnCopyCode">Copiar mi código</button>
         <p class="savemsg" id="saveMsg" aria-live="polite"></p>
       </div>
-      <p class="sub" style="text-align:center">Trasvase · versión 14</p>
+      <p class="sub" style="text-align:center">Trasvase · versión 15</p>
     </div>
   </div>
 </div>
