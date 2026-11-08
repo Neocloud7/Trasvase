@@ -233,11 +233,20 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
 .shelf{position:static;width:100%;max-width:100%;height:86px;display:block;border-radius:14px}
 /* title screen */
 #titleOv{background:radial-gradient(120% 80% at 50% 30%,rgba(12,33,36,.35),rgba(6,16,18,.88));backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
-.title-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:360px;text-align:center}
+.title-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:400px;text-align:center}
 .logo{font:400 clamp(52px,15vw,84px)/.95 var(--display);color:var(--brass);text-shadow:0 5px 0 #8a5c10,0 14px 30px rgba(0,0,0,.45);letter-spacing:.01em;margin:0;animation:float 3.2s ease-in-out infinite}
 .logo-sub{font:800 15px var(--body);color:var(--text);opacity:.85;margin:0}
 .logo-tag{font:900 11px var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--leaf);margin:0}
-.title-btns{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:8px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-top:8px}
+.tile{position:relative;border:none;border-radius:20px;padding:14px 12px 13px;text-align:left;display:flex;flex-direction:column;gap:4px;cursor:pointer;color:var(--text);
+  background:linear-gradient(160deg,rgba(var(--c),.34),rgba(var(--c),.12));box-shadow:inset 0 0 0 1.5px rgba(var(--c),.6),0 4px 0 rgba(0,0,0,.28);transition:transform .12s}
+.tile:active{transform:translateY(3px);box-shadow:inset 0 0 0 1.5px rgba(var(--c),.6),0 1px 0 rgba(0,0,0,.28)}
+.tile:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+.tile .ti{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:rgb(var(--c));color:#1a1206;margin-bottom:4px}
+.tile .ti svg{width:24px;height:24px}
+.tile b{font:400 21px/1.05 var(--display);color:var(--text)}
+.tile small{font:800 12px/1.3 var(--body);color:var(--text);opacity:.75;min-height:16px}
+.tile .dot{top:10px;right:10px}
 .title-bottles{display:flex;gap:14px;align-items:flex-end;height:96px}
 .tb{width:26px;border-radius:6px 6px 14px 14px;border:2px solid rgba(214,242,242,.6);display:flex;flex-direction:column-reverse;overflow:hidden;padding:2px;gap:0;animation:float 2.6s ease-in-out infinite}
 .tb i{display:block;height:18px}
@@ -280,6 +289,9 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
   .badge{top:-6px;right:-4px}
   .title-bottles{display:none}
   .logo{font-size:48px}
+  .title-wrap{max-width:760px;gap:8px}
+  .tiles{grid-template-columns:repeat(4,1fr)}
+  .tile .ti{width:34px;height:34px}
 }
 /* tablets and big screens */
 @media (min-width:700px) and (min-height:700px){
@@ -367,11 +379,11 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
     <h1 class="logo">Trasvase</h1>
     <p class="logo-sub">Ordena los colores, un frasco cada vez</p>
     <p class="logo-tag">Sin anuncios · Sin compras</p>
-    <div class="title-btns">
-      <button class="btn primary" id="tPlay">Jugar</button>
-      <button class="btn ghost" id="tStory">Modo historia</button>
-      <button class="btn ghost" id="tDaily">Reto diario</button>
-      <button class="btn ghost" id="tModes">Más modos</button>
+    <div class="tiles">
+      <button class="tile" id="tStory" style="--c:242,184,75"><span class="ti"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.5 18.5A2 2 0 0 0 6.2 21.5h11.6a2 2 0 0 0 1.7-3L14 9V3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 15h10l2.3 4H4.7z" fill="currentColor"/></svg></span><b>Historia</b><small id="tStorySub"></small></button>
+      <button class="tile" id="tPlay" style="--c:76,195,255"><span class="ti"><svg viewBox="0 0 24 24"><path d="M7.5 8.5c-2.5 0-4.5 1.6-4.5 3.5s2 3.5 4.5 3.5c3.5 0 5.5-7 9-7 2.5 0 4.5 1.6 4.5 3.5s-2 3.5-4.5 3.5c-3.5 0-5.5-7-9-7z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><b>Infinito</b><small id="tPlaySub"></small></button>
+      <button class="tile" id="tDaily" style="--c:255,154,46"><span class="ti"><svg viewBox="0 0 24 24"><path d="M12 2c1 3.5 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.4-5 .1 1.6.8 2.7 1.8 3.2C11 8 11.4 5 12 2z" fill="currentColor"/></svg></span><b>Reto diario</b><small id="tDailySub"></small><span class="dot" id="tDailyDot" hidden></span></button>
+      <button class="tile" id="tModes" style="--c:201,168,255"><span class="ti"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="2" fill="currentColor"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="2" fill="currentColor"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="2" fill="currentColor"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="2" fill="currentColor"/></svg></span><b>Más modos</b><small>Zen, contrarreloj y editor</small></button>
     </div>
   </div>
 </div>
@@ -436,15 +448,16 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
       <button class="icon-btn" id="btnCloseMenu" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="tabs" role="tablist">
-      <button class="tab" role="tab" data-tab="levels" aria-selected="true">Niveles</button>
+      <button class="tab" role="tab" data-tab="modes" aria-selected="true">Modos</button>
       <button class="tab" role="tab" data-tab="daily" aria-selected="false">Reto diario<span class="dot" id="tabDot" hidden></span></button>
-      <button class="tab" role="tab" data-tab="modes" aria-selected="false">Modos</button>
       <button class="tab" role="tab" data-tab="ach" aria-selected="false">Logros</button>
       <button class="tab" role="tab" data-tab="skins" aria-selected="false">Tienda</button>
       <button class="tab" role="tab" data-tab="coll" aria-selected="false">Colección</button>
       <button class="tab" role="tab" data-tab="more" aria-selected="false">Más</button>
     </div>
-    <div class="panel" id="p-levels" role="tabpanel">
+    <div class="panel" id="p-levels" role="tabpanel" hidden>
+      <button class="btn ghost small" id="lvBack">← Volver a los modos</button>
+      <h3 class="ach-h">Modo infinito</h3>
       <p class="sub" id="lvSub"></p>
       <div class="lvgrid" id="lvGrid"></div>
     </div>
@@ -476,7 +489,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-acti
         <button class="btn ghost small" id="btnCopyCode">Copiar mi código</button>
         <p class="savemsg" id="saveMsg" aria-live="polite"></p>
       </div>
-      <p class="sub" style="text-align:center">Trasvase · versión 9</p>
+      <p class="sub" style="text-align:center">Trasvase · versión 10</p>
     </div>
   </div>
 </div>
@@ -1013,7 +1026,7 @@ function renderHeader(){
   else if(S.mode==='zen'){$('lvlLabel').textContent='Modo zen';$('lvlNum').textContent=save.zenCount+1;h+='<span class="chip breath">Sin prisa ni estrellas</span>';}
   else if(S.mode==='rush'){$('lvlLabel').textContent='Contrarreloj · '+RUSH.solved+(RUSH.solved===1?' resuelto':' resueltos');$('lvlNum').textContent=fmtTime(RUSH.left);}
   else if(S.mode==='custom'){$('lvlLabel').textContent=customFriend?'Puzle de un amigo':'Tu puzle';$('lvlNum').textContent='Editor';}
-  else{$('lvlLabel').textContent='Nivel · '+WORLDS[curWorld].name;$('lvlNum').textContent=S.level;}
+  else{$('lvlLabel').textContent='Infinito · '+WORLDS[curWorld].name;$('lvlNum').textContent=S.level;}
   if(ev&&S.mode==='level')h+='<span class="chip type">'+ev.name+'</span>';
   if(S.mode!=='level'&&S.mode!=='daily'&&S.mode!=='story'){
     h+='<span class="chip drops" id="dropsChip" title="Gotas">'+DROP_SVG+'<b id="dropsNum">'+save.drops+'</b></span>';
@@ -2060,15 +2073,16 @@ function setMuted(m){save.muted=m;persist();updateTools();syncSwitches();if(!m){
 $('btnSound').onclick=()=>setMuted(!save.muted);
 
 /* ================= menu ================= */
-let curTab='levels';
+let curTab='modes';
 $('btnMenu').onclick=()=>openMenu(curTab);
 $('btnCloseMenu').onclick=()=>{$('menuOv').hidden=true;};
 $('menuOv').addEventListener('click',e=>{if(e.target.id==='menuOv')$('menuOv').hidden=true;});
 document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>showTab(t.dataset.tab));
-function openMenu(tab){$('menuOv').hidden=false;showTab(tab||'levels');}
+function openMenu(tab){$('menuOv').hidden=false;showTab(tab||'modes');}
+$('lvBack').onclick=()=>showTab('modes');
 function showTab(tab){
   curTab=tab;
-  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',String(t.dataset.tab===tab)));
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-selected',String(t.dataset.tab===tab||(tab==='levels'&&t.dataset.tab==='modes'))));
   ['levels','daily','modes','ach','skins','coll','more'].forEach(k=>$('p-'+k).hidden=k!==tab);
   ({levels:renderLevels,daily:renderDaily,modes:renderModes,ach:renderAch,skins:renderSkins,coll:renderColl,more:renderMore})[tab]();
 }
@@ -2406,7 +2420,13 @@ $('storyClose').onclick=()=>{$('storyOv').hidden=true;};
 
 /* ================= title screen ================= */
 function showTitle(){
-  $('tPlay').textContent='Jugar · Nivel '+Math.min(save.current||1,save.unlocked);
+  fixStory();
+  const L=Math.min(save.current||1,save.unlocked),sm=save.story.max||0;
+  $('tPlaySub').textContent='Nivel '+L+' · '+WORLDS[worldOf(L)].name;
+  $('tStorySub').textContent=save.story.finished?'Historia completada':(sm||save.story.stars['0'])?'Capítulo '+(Math.floor(sm/10)+1)+' · '+(sm%10+1)+'/10':'Empieza la aventura';
+  const done=save.daily.last===todayStr(),alive=done||save.daily.last===todayStr(-1);
+  $('tDailySub').textContent=(done?'Hecho hoy':'Pendiente')+(alive&&save.daily.streak?' · racha '+save.daily.streak:'');
+  $('tDailyDot').hidden=done;
   $('titleOv').hidden=false;
 }
 function hideTitle(){$('titleOv').hidden=true;sfx.unlock();}
@@ -2581,12 +2601,17 @@ function renderModes(){
   if(ev)h+='<div class="box"><div class="mode-card"><div class="flame" style="background:rgba(155,92,255,.18);color:var(--grape)"><svg viewBox="0 0 24 24">'+ICONS.star+'</svg></div><div><h3>Evento: '+ev.name+'</h3><p class="sub">'+ev.blurb+' Quedan '+eventDaysLeft(ev)+' días. El fondo del evento ya está puesto, tienes artículos especiales en la tienda y logros propios.</p></div></div></div>';
   fixStory();
   h+='<div class="box"><div class="mode-card"><div class="flame" style="background:rgba(242,184,75,.16);color:var(--brass)"><svg viewBox="0 0 24 24">'+ICONS.flask+'</svg></div><div><h3>Modo historia</h3><p class="sub">Lía, aprendiz de alquimista, contra el Barón Grumo y compañía. 4 capítulos y 40 puzles con jefes.</p></div></div><button class="btn primary" id="mStory">'+(save.story.max||save.story.stars['0']?'Continuar la historia':'Empezar la historia')+'</button></div>';
+  const Lc=Math.min(save.current||1,save.unlocked);
+  h+='<div class="box"><div class="mode-card"><div class="flame" style="background:rgba(76,195,255,.14);color:var(--water)"><svg viewBox="0 0 24 24"><path d="M7.5 8.5c-2.5 0-4.5 1.6-4.5 3.5s2 3.5 4.5 3.5c3.5 0 5.5-7 9-7 2.5 0 4.5 1.6 4.5 3.5s-2 3.5-4.5 3.5c-3.5 0-5.5-7-9-7z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></div><div><h3>Modo infinito</h3><p class="sub">Niveles sin fin que se van complicando, con jefes cada 10 y todos los tipos de nivel. Vas por el nivel '+Lc+'.</p></div></div>'+
+    '<button class="btn primary" id="mInf">Continuar · Nivel '+Lc+'</button><button class="btn ghost small" id="mInfPick">Elegir nivel</button></div>';
   h+='<div class="box"><div class="mode-card"><div class="flame" style="background:rgba(166,227,90,.14);color:var(--leaf)"><svg viewBox="0 0 24 24">'+ICONS.moon+'</svg></div><div><h3>Modo zen</h3><p class="sub">Puzles tranquilos uno detrás de otro, sin estrellas ni contador. Pistas gratis. Llevas '+(save.zenCount||0)+'.</p></div></div><button class="btn primary" id="mZen">Jugar en zen</button></div>';
   h+='<div class="box"><div class="mode-card"><div class="flame"><svg viewBox="0 0 24 24">'+ICONS.clock+'</svg></div><div><h3>Contrarreloj</h3><p class="sub">Resuelve todos los puzles que puedas en 3 minutos. Ganas una gota por puzle (hasta 15). Récord: '+(save.rushBest||0)+'.</p></div></div><button class="btn primary" id="mRush">Empezar (3 min)</button></div>';
   h+='<div class="box"><div class="mode-card"><div class="flame" style="background:rgba(76,195,255,.14);color:var(--water)"><svg viewBox="0 0 24 24">'+ICONS.flask+'</svg></div><div><h3>Editor de niveles</h3><p class="sub">Diseña tus puzles, compruébalos y comparte el código con tus amigos.</p></div></div><button class="btn primary" id="mEdit">Abrir el editor</button>'+
     '<div class="savebox"><label for="mCode">Código de un amigo</label><div class="saverow"><input id="mCode" type="text" autocomplete="off" spellcheck="false" placeholder="TRV2-…"><button class="btn ghost small" id="mCodePlay">Jugar</button></div><p class="savemsg" id="mMsg" aria-live="polite"></p></div></div>';
   $('p-modes').innerHTML=h;
-  $('mStory').onclick=openStory;$('mZen').onclick=startZen;$('mRush').onclick=startRush;$('mEdit').onclick=openEditor;
+  $('mStory').onclick=openStory;$('mZen').onclick=startZen;
+  $('mInf').onclick=()=>{$('menuOv').hidden=true;RUSH.active=false;bootLevel();};
+  $('mInfPick').onclick=()=>showTab('levels');$('mRush').onclick=startRush;$('mEdit').onclick=openEditor;
   $('mCodePlay').onclick=()=>{let t;try{t=decodePuzzle($('mCode').value);}catch(e){$('mMsg').textContent='Ese código no es válido. Revisa que esté completo.';return;}checkAndPlay(t,true,m=>{$('mMsg').textContent=m;});};
 }
 function renderColl(){
