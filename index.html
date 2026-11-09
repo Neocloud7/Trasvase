@@ -546,7 +546,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         <button class="btn ghost small" id="btnCopyCode">Copiar mi código</button>
         <p class="savemsg" id="saveMsg" aria-live="polite"></p>
       </div>
-      <p class="sub" style="text-align:center">Trasvase · versión 17</p>
+      <p class="sub" style="text-align:center">Trasvase · versión 18</p>
     </div>
   </div>
 </div>
@@ -675,9 +675,10 @@ const MECH={
   lock:{name:'Candado',intro:27,tip:'Completa el color del candado para abrir ese tubo'},
   rainbow:{name:'Arcoíris',intro:33,tip:'El arcoíris encaja sobre cualquier color y se disuelve al tocarlo'},
   tap:{name:'Grifo',intro:38,tip:'Los tubos con grifo vierten desde abajo'},
-  twins:{name:'Gemelas',intro:43,tip:'Al verter de una gemela, la otra también vierte si su color encaja'}
+  twins:{name:'Gemelas',intro:43,tip:'Al verter de una gemela, la otra también vierte si su color encaja'},
+  giant:{name:'Botella gigante',intro:48,tip:'No hay tubos vacíos: usa la botella gigante para apartar colores y déjala vacía al final'}
 };
-const MECH_ORDER=['collector','ice','count','sizes','lock','rainbow','tap','twins'];
+const MECH_ORDER=['collector','ice','count','sizes','lock','rainbow','tap','twins','giant'];
 let DISPLAY_FONT="'Bagel Fat One','Trebuchet MS',system-ui,sans-serif";
 const RIBBONS=['#ff6fa8','#ffb347','#7fe8da'];
 
@@ -763,13 +764,14 @@ function levelSpec(L){
   if(L<8||breather)mechs=[];
   else if(intro)mechs=[intro];
   else if(boss){
-    const pick=shuffle(pool.filter(m=>m!=='count'),r).slice(0,2);
+    let pick=shuffle(pool.filter(m=>m!=='count'),r).slice(0,2);
+    if(pick.includes('giant')&&pick.includes('collector'))pick=pick.filter(m=>m!=='collector');
     mechs=pick;if(pool.includes('count')&&r()<.4)mechs.push('count');
   }else{
     const tot=3+pool.length;let x=r()*tot;
     if(x>=3)mechs=[pool[Math.min(pool.length-1,Math.floor(x-3))]];
   }
-  const noHidden=breather||L<31||mechs.some(m=>m==='collector'||m==='tap'||m==='rainbow');
+  const noHidden=breather||L<31||mechs.some(m=>m==='collector'||m==='tap'||m==='rainbow'||m==='giant');
   const hiddenP=noHidden?0:Math.min(.5,(L-27)/80);
   return{L,colors,mechs,boss,breather,hiddenP,seed:L*7919+13,sets:L<40?2:3};
 }
@@ -794,7 +796,7 @@ const STORY_MECHS=[
   [[],[],[],[],['collector'],[],['collector'],[],['collector'],['collector']],
   [['ice'],['ice'],['ice'],[],['count'],['count'],['sizes'],['sizes'],['ice'],['sizes','ice','count']],
   [['lock'],['lock'],['lock'],['rainbow'],['rainbow'],['tap'],['tap'],['tap'],['lock'],['tap','lock']],
-  [['twins'],['twins'],['twins'],[],['collector'],['twins'],['twins'],['rainbow'],['ice'],['twins','collector']]
+  [['twins'],['twins'],['twins'],['giant'],['collector'],['twins'],['giant'],['rainbow'],['ice'],['twins','collector']]
 ];
 const STORY_LEN=40;
 function storySpec(i){
@@ -814,6 +816,7 @@ function solve(start,meta,limit,firstOnly){
   const anyGate=need.some(x=>x>0)||lock.some(x=>x>=0);
   function doneT(t,i){
     if(only[i]>=0)return t.length===cap[i];
+    if(cap[i]>5)return false;
     if(t.length!==CAP)return false;
     const c=t[0];if(c>=32||c===RB||coll.has(c))return false;
     for(const x of t)if(x!==c)return false;
@@ -903,6 +906,7 @@ function landOn(b,c,k){
 /* ================= level generation ================= */
 function buildCandidate(spec,mechs,rnd){
   const M=new Set(mechs);
+  if(M.has('giant')){M.delete('collector');M.delete('sizes');}
   let colors=spec.colors,collect=[];
   if(M.has('collector'))colors=Math.max(2,colors-1);
   const pal=shuffle([...Array(12).keys()],rnd).slice(0,colors+(M.has('collector')?2:0));
@@ -911,7 +915,8 @@ function buildCandidate(spec,mechs,rnd){
   collect.forEach(c=>{for(let i=0;i<CAP*spec.sets;i++)pool.push(c);});
   if(M.has('rainbow')){const nr=pal.length>=7?3:2;for(let k=0;k<nr;k++)pool.push(RB);}
   shuffle(pool,rnd);
-  const filled=Math.ceil(pool.length/CAP);
+  // giant levels spread the layers over one more small bottle, so some have a gap
+  const filled=Math.ceil(pool.length/CAP)+(M.has('giant')?1:0);
   let caps=Array(filled).fill(CAP);
   if(M.has('sizes')){
     const pairs=filled>=9?2:1;
@@ -919,12 +924,16 @@ function buildCandidate(spec,mechs,rnd){
     shuffle(caps,rnd);
   }
   const tubes=[];let at=0;
-  for(const c of caps){tubes.push(pool.slice(at,at+c));at+=c;}
+  if(M.has('giant'))caps.forEach((c,k)=>{const l=Math.min(CAP,Math.round((pool.length-at)/(filled-k)));tubes.push(pool.slice(at,at+l));at+=l;});
+  else for(const c of caps){tubes.push(pool.slice(at,at+c));at+=c;}
   if(tubes.some(t=>t.length===CAP&&t.every(c=>c===t[0])))return null;
-  for(let i=0;i<2;i++)tubes.push([]);
+  const giant=M.has('giant');
+  if(!giant)for(let i=0;i<2;i++)tubes.push([]);
   const n0=tubes.length;
   const cap=tubes.map((t,i)=>i<filled?caps[i]:CAP),only=Array(n0).fill(-1),need=Array(n0).fill(0),lock=Array(n0).fill(-1),tap=Array(n0).fill(0),twin=Array(n0).fill(-1);
   collect.forEach(c=>{tubes.push([]);cap.push(CAP*spec.sets);only.push(c);need.push(0);lock.push(-1);tap.push(0);twin.push(-1);});
+  // one tall bottle that takes any colour, instead of the two spare tubes
+  if(giant){tubes.push([]);cap.push(CAP*2+(colors>=9?4:0));only.push(-1);need.push(0);lock.push(-1);tap.push(0);twin.push(-1);}
   // special tubes are picked among the filled ones without overlap
   const free=shuffle([...Array(filled).keys()],rnd);
   const take=()=>free.length?free.pop():-1;
@@ -984,10 +993,12 @@ const cv=$('cv'),stage=$('stage');let ctx=cv.getContext('2d');
 
 /* ----- rules ----- */
 function isCollector(i){return S.only[i]>=0;}
+function isGiant(i){return S.only[i]<0&&S.cap[i]>5;}
 function doneColorOf(i){return isCollector(i)?S.only[i]:S.tubes[i][0];}
 function isDone(i){
   const t=S.tubes[i];if(!t.length)return false;
   if(isCollector(i))return t.length===S.cap[i];
+  if(isGiant(i))return false;
   if(t.length!==CAP||S.hidden[i].some(Boolean))return false;
   const c=t[0];if(c===RB||S.only.includes(c))return false;
   return t.every(x=>x===c);
@@ -1164,9 +1175,9 @@ function layout(){
   cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);
   const SX=r.left-cr.left,SY=r.top-cr.top,SW=r.width,SH=r.height;
   const N=S.tubes.length;if(!N||!W||!H||!SW||!SH)return;
-  const reg=[],col=[];for(let i=0;i<N;i++)(S.only[i]>=0?col:reg).push(i);
+  const reg=[],col=[];for(let i=0;i<N;i++)(S.only[i]>=0||(S.cap[i]>5&&S.only[i]<0)?col:reg).push(i);
   const big=Math.max(1,Math.min(1.9,Math.min(SW,SH)/420));
-  const sideW=col.length?Math.min(SW*.17,86*big):0,RW=SW-2*sideW,n=reg.length;
+  const sideW=col.length?Math.min(SW*.17,86*big):0,leftW=sideW,rightW=col.length>1?sideW:0,RW=SW-leftW-rightW,n=reg.length;
   let best=null;
   for(let rows=1;rows<=4;rows++){
     const cols=Math.ceil(n/rows);if(rows>1&&Math.ceil(n/(rows-1))<=3)continue;
@@ -1187,7 +1198,7 @@ function layout(){
   let y=SY+Math.max(L*.34,(SH-blockH)/2+L*.1);const top=y;
   pos=[];geom=[];let k=0;
   per.forEach(c=>{
-    const gap=Math.min(w*.62,(RW-c*w)/(c+1));const rowW=c*w+(c-1)*gap;let x=SX+sideW+(RW-rowW)/2+w/2;
+    const gap=Math.min(w*.62,(RW-c*w)/(c+1));const rowW=c*w+(c-1)*gap;let x=SX+leftW+(RW-rowW)/2+w/2;
     for(let j=0;j<c;j++){
       const i=reg[k++];
       if(S.cap[i]!==CAP){const d=(S.cap[i]-CAP)*G.segH;geom[i]=Object.assign({},G,{L:L+d,Lb:Lb+d});pos[i]={x,y:y-d};}
@@ -1823,6 +1834,7 @@ addAch('Habilidad',[[500,'po500','Trasvasador',2],[2000,'po2k','Manos expertas',
  ['tw5','Gemelas','t_twins',5,3,'Supera 5 niveles de gemelas','link'],['tw25','Inseparables','t_twins',25,8,'Supera 25 niveles de gemelas','link'],
  ['sz5','A medida','t_sizes',5,3,'Supera 5 niveles de tamaños','flask'],['sz25','Sastre','t_sizes',25,8,'Supera 25 niveles de tamaños','flask'],
  ['ct5','Contable','countWithin',5,3,'Supera 5 niveles Contados sin pasarte','clock'],['ct25','Calculadora','countWithin',25,8,'Supera 25 niveles Contados sin pasarte','clock'],
+ ['gi5','A lo grande','t_giant',5,3,'Supera 5 niveles de botella gigante','flask'],['gi25','Titán','t_giant',25,8,'Supera 25 niveles de botella gigante','flask'],
  ['rv25','Curioso','reveals',25,3,'Descubre 25 capas ocultas','eye'],['rv100','Detective','reveals',100,8,'Descubre 100 capas ocultas','eye']
 ].forEach(([id,name,k,goal,r,desc,ic])=>ACH.push({cat:'Tipos de nivel',id,name,desc,goal,val:st(k),r,ic}));
 addAch('Jefes y mundos',[[1,'boss1','Primer jefe',3],[3,'boss','Cazajefes',5],[10,'boss10','Matajefes',12,'shape:tarro'],[25,'boss25','Rey de reyes',25]],g=>'Derrota '+g+pl(g,' jefe',' jefes'),st('bosses'),'crown');
