@@ -546,7 +546,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         <button class="btn ghost small" id="btnCopyCode">Copiar mi código</button>
         <p class="savemsg" id="saveMsg" aria-live="polite"></p>
       </div>
-      <p class="sub" style="text-align:center">Trasvase · versión 18</p>
+      <p class="sub" style="text-align:center">Trasvase · versión 19</p>
     </div>
   </div>
 </div>
@@ -1229,6 +1229,8 @@ function tubePath(){
   else{ctx.lineTo(hw,shY);ctx.bezierCurveTo(hw,neckH+d*.35,hn,neckH+d*.5,hn,neckH);ctx.lineTo(hn,0);}
   ctx.closePath();
 }
+function glassT(){return Math.max(1.2,G.w*.055);}
+const WOB=[];function wob(i){return WOB[i]||(WOB[i]={a:0,v:0,rip:0,rx:0,pa:0,sel:false});}
 function corners(tx){const c=Math.cos(tx.a),s=Math.sin(tx.a),hw=G.w/2,Lb=G.Lb;return[[-hw,0],[hw,0],[hw,Lb],[-hw,Lb]].map(([x,y])=>[tx.x+x*c-y*s,tx.y+x*s+y*c]);}
 function areaBelow(poly,l){
   const o=[];for(let i=0;i<poly.length;i++){const P=poly[i],Q=poly[(i+1)%poly.length],pi=P[1]>=l,qi=Q[1]>=l;if(pi)o.push(P);if(pi!==qi){const t=(l-P[1])/(Q[1]-P[1]);o.push([P[0]+t*(Q[0]-P[0]),l]);}}
@@ -1312,10 +1314,13 @@ function drawTube(i,tx,layers,now,isSel){
   const total=merged.reduce((s,l)=>s+l.v,0);
   if(total>0.002){
     ctx.save();
-    ctx.save();ctx.translate(tx.x,tx.y);ctx.rotate(tx.a);tubePath();ctx.restore();ctx.clip();
+    const gt=glassT();
+    ctx.save();ctx.translate(tx.x,tx.y);ctx.rotate(tx.a);ctx.scale(1-2*gt/w,(L-gt)/L);tubePath();ctx.restore();ctx.clip();
     if(upright){
+      // the surface sloshes: sl is the slope of every liquid boundary (dy per dx)
+      const sl=WOB[i]?WOB[i].a:0,rot=Math.atan(-sl),cr=Math.cos(rot),sr=Math.sin(rot);
       const x=tx.x;let low=tx.y+L+eh+6,cum=0,top=low;
-      const seg=(up,lo)=>{ctx.beginPath();ctx.moveTo(x-w,up);ctx.lineTo(x+w,up);ctx.lineTo(x+w,lo);ctx.lineTo(x+w/2,lo);ctx.ellipse(x,lo,w/2,eh,0,0,Math.PI);ctx.lineTo(x-w,lo);ctx.closePath();};
+      const seg=(up,lo)=>{ctx.beginPath();ctx.moveTo(x-w,up+sl*w);ctx.lineTo(x+w,up-sl*w);ctx.lineTo(x+w,lo-sl*w);ctx.lineTo(x+w/2*cr,lo+w/2*sr);ctx.ellipse(x,lo,w/2,eh,rot,0,Math.PI);ctx.lineTo(x-w,lo+sl*w);ctx.closePath();};
       merged.forEach((l,idx)=>{
         cum+=l.v;const up=tx.y+Lb-cum*segH;
         if(l.c===RB&&!l.hid){
@@ -1330,7 +1335,7 @@ function drawTube(i,tx,layers,now,isSel){
           seg(up,low);ctx.fillStyle=g;ctx.fill();
         }
         if(idx>0){
-          ctx.beginPath();ctx.ellipse(x,low,w/2-1,eh,0,.15,Math.PI-.15);
+          ctx.beginPath();ctx.ellipse(x,low,w/2-1,eh,rot,.15,Math.PI-.15);
           ctx.globalAlpha=.9;ctx.strokeStyle=l.hid?'#3a5458':l.c===RB?'#ffffff':shade(COLORS[l.c],.35);ctx.lineWidth=Math.max(1,w*.03);ctx.stroke();ctx.globalAlpha=1;
         }
         const yb=Math.min(low,tx.y+Lb),hgt=yb-up;
@@ -1349,8 +1354,15 @@ function drawTube(i,tx,layers,now,isSel){
       if(tl.c===RB&&!tl.hid){ctx.fillStyle=rainbowGrad(x-w/2,x+w/2);}
       else{const tb=tl.hid?'#24383c':COLORS[tl.c];const sg=ctx.createLinearGradient(x-w/2,0,x+w/2,0);
         sg.addColorStop(0,shade(tb,.05));sg.addColorStop(.35,shade(tb,.45));sg.addColorStop(1,shade(tb,.12));ctx.fillStyle=sg;}
-      ctx.beginPath();ctx.ellipse(x,top,w/2,eh,0,0,Math.PI*2);ctx.fill();
-      ctx.fillStyle='rgba(255,255,255,.35)';ctx.beginPath();ctx.ellipse(x-w*.14,top-eh*.15,w*.16,eh*.35,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.ellipse(x,top,w/2,eh,rot,0,Math.PI*2);ctx.fill();
+      // meniscus: a darker rim where the surface meets the glass, and a soft reflection
+      ctx.strokeStyle='rgba(0,0,0,.14)';ctx.lineWidth=Math.max(1,w*.03);ctx.beginPath();ctx.ellipse(x,top,w/2-w*.015,eh*.92,rot,Math.PI*1.05,Math.PI*1.95);ctx.stroke();
+      ctx.fillStyle='rgba(255,255,255,.38)';ctx.beginPath();ctx.ellipse(x-w*.14,top-eh*.15+sl*w*.14,w*.16,eh*.35,rot,0,Math.PI*2);ctx.fill();
+      // ripples while liquid is landing
+      const rp=WOB[i]?WOB[i].rip:0;
+      if(rp>.02){ctx.strokeStyle='rgba(255,255,255,'+(.45*rp)+')';ctx.lineWidth=Math.max(1,w*.025);
+        for(let k=0;k<2;k++){const f=((now*1.6+k*.5)%1);ctx.globalAlpha=1-f;ctx.beginPath();ctx.ellipse(x+(WOB[i].rx||0),top,w*.12+w*.3*f,eh*(.3+.6*f),rot,0,Math.PI*2);ctx.stroke();}
+        ctx.globalAlpha=1;}
     }else{
       const poly=corners(tx);
       let lower=Math.max(...poly.map(p=>p[1]))+G.r+6,cum=0,top=lower;
@@ -1360,6 +1372,7 @@ function drawTube(i,tx,layers,now,isSel){
         cum+=l.v;const up=levelFor(poly,cum*segH*w);
         ctx.fillStyle=l.hid?'#24383c':l.c===RB?rainbowGrad(tx.x-L,tx.x+L):COLORS[l.c];
         ctx.fillRect(tx.x-L*1.6,up,L*3.2,lower-up+.6);
+        if(lower!==Math.max(...poly.map(p=>p[1]))+G.r+6&&!l.hid){ctx.fillStyle='rgba(255,255,255,.22)';ctx.fillRect(tx.x-L*1.6,lower-1,L*3.2,Math.max(1,w*.03));}
         lower=up;top=up;
       });
       void tap;
@@ -1377,9 +1390,16 @@ function drawTube(i,tx,layers,now,isSel){
 
   ctx.save();ctx.translate(tx.x,tx.y);ctx.rotate(tx.a);
   if(S.tap[i])drawTap();
+  // inner wall of the glass
+  {const gt=glassT();ctx.save();ctx.scale(1-2*gt/w,(L-gt)/L);tubePath();ctx.restore();
+   ctx.lineWidth=Math.max(.8,w*.018);ctx.strokeStyle='rgba(255,255,255,.16)';ctx.stroke();}
   tubePath();
-  ctx.lineWidth=Math.max(1.6,w*.05);
-  ctx.strokeStyle=isSel?'#f2b84b':'rgba(200,236,248,.62)';ctx.stroke();
+  ctx.lineWidth=isSel?Math.max(2,w*.06):Math.max(1.2,w*.035);
+  ctx.strokeStyle=isSel?'#f2b84b':'rgba(228,246,255,.78)';ctx.stroke();
+  // thick glass base
+  {const by=L-Math.max(br,w*.18)*.35;const bg=ctx.createLinearGradient(0,by-w*.1,0,L);bg.addColorStop(0,'rgba(255,255,255,0)');bg.addColorStop(1,'rgba(255,255,255,.22)');
+   ctx.save();tubePath();ctx.clip();ctx.fillStyle=bg;ctx.fillRect(-w,by-w*.1,2*w,w);ctx.restore();
+   ctx.strokeStyle='rgba(255,255,255,.3)';ctx.lineWidth=Math.max(1,w*.025);ctx.beginPath();ctx.ellipse(0,L-w*.09,w*.36,w*.05,0,.2,Math.PI-.2);ctx.stroke();}
   const gy0=shY+L*.03,gh=L-Math.max(br,w*.2)-gy0-L*.04;
   const hg=ctx.createLinearGradient(0,gy0,0,gy0+gh);
   hg.addColorStop(0,'rgba(255,255,255,.62)');hg.addColorStop(.5,'rgba(255,255,255,.32)');hg.addColorStop(1,'rgba(255,255,255,.08)');
@@ -1390,11 +1410,14 @@ function drawTube(i,tx,layers,now,isSel){
     ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=Math.max(1,w*.035);
     ctx.beginPath();ctx.moveTo(-hn+w*.02,G.neckH+L*.01);ctx.quadraticCurveTo(-w*.42,shY*.9,-w*.42,shY+L*.02);ctx.stroke();
   }
-  const rimW=hn*2+w*.14,rimH=w*.2;
+  // rolled glass lip: a clear ring with the opening seen from slightly above
+  const rimW=hn*2+w*.16,rimH=w*.22,ry=-rimH*.25;
   const rg=ctx.createLinearGradient(-rimW/2,0,rimW/2,0);
-  rg.addColorStop(0,isSel?'#c98a1f':'rgba(170,215,230,.55)');rg.addColorStop(.35,isSel?'#ffe1a1':'rgba(235,250,255,.85)');rg.addColorStop(1,isSel?'#c98a1f':'rgba(150,200,220,.5)');
-  ctx.fillStyle=rg;ctx.beginPath();rr(-rimW/2,-rimH*.55,rimW,rimH,rimH/2);ctx.fill();
-  ctx.fillStyle='rgba(12,33,36,.55)';ctx.beginPath();ctx.ellipse(0,-rimH*.55+rimH*.32,hn*.82,rimH*.18,0,0,Math.PI*2);ctx.fill();
+  rg.addColorStop(0,isSel?'#c98a1f':'rgba(200,232,245,.42)');rg.addColorStop(.28,isSel?'#ffe1a1':'rgba(255,255,255,.75)');rg.addColorStop(.6,isSel?'#f2b84b':'rgba(220,242,252,.3)');rg.addColorStop(1,isSel?'#c98a1f':'rgba(200,232,245,.5)');
+  ctx.fillStyle=rg;ctx.beginPath();rr(-rimW/2,ry-rimH*.35,rimW,rimH,rimH/2);ctx.fill();
+  ctx.strokeStyle=isSel?'#ffe1a1':'rgba(240,250,255,.8)';ctx.lineWidth=Math.max(1,w*.025);ctx.stroke();
+  ctx.fillStyle='rgba(0,0,0,.22)';ctx.beginPath();ctx.ellipse(0,ry-rimH*.08,hn*.86,rimH*.2,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=Math.max(.8,w*.02);ctx.beginPath();ctx.ellipse(0,ry-rimH*.08,hn*.86,rimH*.2,0,Math.PI*.1,Math.PI*.9);ctx.stroke();
   if(S.only[i]>=0)drawTag(i);
   if(upright&&(S.need[i]||0)>0)drawIce(i,now);
   if(upright&&S.lock[i]>=0)drawLock(i,now);
@@ -1751,6 +1774,19 @@ function frame(){
     const target=selected===i?-G.L*.16:0;lift[i]+=(target-lift[i])*Math.min(1,dt*16);
     if(shake[i]>0)shake[i]=Math.max(0,shake[i]-dt);
   }
+  // liquid inertia: lifting, tilting and incoming streams push the surface, a damped spring brings it back
+  for(let i=0;i<S.tubes.length;i++){
+    const o=wob(i),sel=selected===i;
+    if(sel!==o.sel){o.v+=(sel?1:-.7)*(1.1+Math.random()*.5)*(Math.random()<.5?1:-1);o.sel=sel;}
+    if(shake[i]>0)o.v+=Math.cos(shake[i]*60)*dt*40;
+    const tl=txs.get(i),a=tl?tl.a:0;o.v-=(a-o.pa)*5;o.pa=a;
+    o.rip=Math.max(0,o.rip-dt*1.8);
+  }
+  for(const an of anims){if(an.phase!==1)continue;const o=wob(an.dst);
+    const sx=an.kind==='tilt'&&an.lip?an.lip.x:pos[an.dst].x;const dir=Math.sign(sx-pos[an.dst].x)||(Math.random()<.5?1:-1);
+    o.v+=dir*3*dt+(Math.random()-.5)*26*dt;o.rip=Math.min(1,o.rip+dt*5);o.rx=clamp(sx-pos[an.dst].x,-G.w*.25,G.w*.25);}
+  for(let i=0;i<S.tubes.length;i++){const o=wob(i);
+    o.v+=(-170*o.a-5.5*o.v)*dt;o.a=clamp(o.a+o.v*dt,-.3,.3);if(Math.abs(o.a)<1e-4&&Math.abs(o.v)<1e-3){o.a=0;o.v=0;}}
   for(let i=0;i<S.tubes.length;i++){
     if(!pos[i])continue;
     const an=anims.find(a=>a.src===i);
@@ -1766,9 +1802,13 @@ function frame(){
     const sy=surfaceY(an.dst),col=streamColor(an.sc,now);
     if(an.kind==='tilt'&&an.k>.03&&an.k<.98){
       const lip=an.lip,f=Math.min(1,Math.min(an.k-.03,.98-an.k)*14),sw=G.w*.17*f;
-      ctx.fillStyle=col;
-      ctx.beginPath();rr(lip.x-sw/2,lip.y,sw,Math.max(0,sy-lip.y+2),sw/2);ctx.fill();
-      ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(lip.x-sw*.25,lip.y+2,sw*.18,Math.max(0,sy-lip.y-4));
+      const hgt=Math.max(0,sy-lip.y+2),N=10;
+      ctx.fillStyle=col;ctx.beginPath();
+      for(let k=0;k<=N;k++){const t=k/N,yy=lip.y+hgt*t,ww=sw*(1-.3*t)/2,xx=lip.x+Math.sin(now*14+t*5)*sw*.12*t;ctx[k?'lineTo':'moveTo'](xx-ww,yy);}
+      for(let k=N;k>=0;k--){const t=k/N,yy=lip.y+hgt*t,ww=sw*(1-.3*t)/2,xx=lip.x+Math.sin(now*14+t*5)*sw*.12*t;ctx.lineTo(xx+ww,yy);}
+      ctx.closePath();ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.4)';ctx.fillRect(lip.x-sw*.28,lip.y+2,sw*.16,Math.max(0,hgt-6));
+      ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(lip.x,sy,sw*.9,sw*.28,0,0,Math.PI*2);ctx.fill();
       if(Math.random()<.5)particles.push({type:'drop',x:lip.x+(Math.random()-.5)*G.w*.4,y:sy,vx:(Math.random()-.5)*90,vy:-60-Math.random()*90,life:0,max:.35,col,size:G.w*.06*(.6+Math.random())});
     }else if(an.kind==='tap'&&an.k>.04&&an.k<.97){
       const p0=tapPoint(an.src),mx=pos[an.dst].x,my=pos[an.dst].y-G.w*.15;
