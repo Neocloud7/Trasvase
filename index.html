@@ -22,7 +22,8 @@ img{max-width:100%}
 /* installed on the home screen: draw under the status bar and size everything to the full screen height */
 html.standalone,html.standalone body{height:100vh;overflow:hidden}
 html.standalone #app,html.standalone .overlay{bottom:auto;height:var(--app-h,100vh)}
-html.standalone #cv{height:var(--app-h,100vh)}
+html.standalone #cv{height:var(--bg-h,100vh)}
+html.standalone{background:var(--bg3,#0c2124)}
 </style>
 <script>
 (function(){
@@ -30,16 +31,26 @@ html.standalone #cv{height:var(--app-h,100vh)}
   var s=navigator.standalone||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;
   if(!s)return;
   d.classList.add('standalone');
-  // iOS reports one height too short and another too tall here: use the smaller of 100vh and the physical screen
+  // iOS gives several different heights here, some too tall: lay the game out in the smallest one
+  // (so nothing ends up below the screen) and let only the background use the tallest
   function fit(){
     var probe=document.createElement('div');probe.style.cssText='position:fixed;top:0;height:100vh;width:1px;visibility:hidden';
-    (document.body||d).appendChild(probe);var vh=probe.offsetHeight;probe.remove();
+    var bot=document.createElement('div');bot.style.cssText='position:fixed;bottom:0;height:1px;width:1px;visibility:hidden';
+    var host=document.body||d;host.appendChild(probe);host.appendChild(bot);
+    var vh=probe.offsetHeight,pb=bot.getBoundingClientRect().bottom;probe.remove();bot.remove();
     var portrait=innerHeight>=innerWidth,sw=screen.width,sh=screen.height;
     var full=portrait?Math.max(sw,sh):Math.min(sw,sh);
-    var h=Math.min(vh||full,full);
-    d.style.setProperty('--app-h',h+'px');
+    var vv=window.visualViewport?visualViewport.height:0,ih=innerHeight,ch=d.clientHeight;
+    var c=[vh,full,vv,ih,ch,pb].filter(function(v){return v>200;});
+    var h=Math.round(Math.min.apply(null,c)),bg=Math.round(Math.max.apply(null,c));
+    d.style.setProperty('--app-h',h+'px');d.style.setProperty('--bg-h',bg+'px');
+    window.__fitInfo='alto '+h+' · vh '+vh+' · pantalla '+full+' · vv '+Math.round(vv)+' · ventana '+ih+' · doc '+ch+' · fondo '+Math.round(pb);
+    var el=document.getElementById('fitInfo');if(el)el.textContent=window.__fitInfo;
   }
-  fit();addEventListener('DOMContentLoaded',fit);addEventListener('resize',fit);addEventListener('orientationchange',function(){setTimeout(fit,300);});
+  fit();addEventListener('DOMContentLoaded',fit);addEventListener('load',function(){fit();setTimeout(fit,400);setTimeout(fit,1500);});
+  addEventListener('resize',fit);addEventListener('orientationchange',function(){setTimeout(fit,300);setTimeout(fit,900);});
+  if(window.visualViewport)visualViewport.addEventListener('resize',fit);
+  addEventListener('pageshow',fit);
 })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -552,7 +563,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         <button class="btn ghost small" id="btnResetInf">Reiniciar modo infinito</button>
         <p class="savemsg" id="resetMsg" aria-live="polite"></p>
       </div>
-      <p class="sub" style="text-align:center">Trasvase · versión 22</p>
+      <p class="sub" style="text-align:center">Trasvase · versión 23</p>
+      <p class="sub" id="fitInfo" style="text-align:center;font-size:11px;opacity:.6"></p>
     </div>
   </div>
 </div>
@@ -2393,6 +2405,7 @@ function syncSwitches(){
   $('swAmb').setAttribute('aria-checked',String(!!save.ambient));
 }
 function renderMore(){
+  try{if(window.__fitInfo)$('fitInfo').textContent=window.__fitInfo;}catch(e){}
   syncSwitches();
   const st=save.stats;
   const items=[['Niveles superados',levelsDone()],['Estrellas',totalStars()],['Niveles perfectos',perfectCount()],['Trasvases',st.pours||0],
