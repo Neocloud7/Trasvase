@@ -546,7 +546,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         <button class="btn ghost small" id="btnCopyCode">Copiar mi código</button>
         <p class="savemsg" id="saveMsg" aria-live="polite"></p>
       </div>
-      <p class="sub" style="text-align:center">Trasvase · versión 21</p>
+      <div class="box savebox">
+        <label>Empezar de cero</label>
+        <p class="sub">Vuelve al nivel 1 del modo infinito y borra sus estrellas. Conservas las gotas, los logros, la colección, la historia y el reto diario.</p>
+        <button class="btn ghost small" id="btnResetInf">Reiniciar modo infinito</button>
+        <p class="savemsg" id="resetMsg" aria-live="polite"></p>
+      </div>
+      <p class="sub" style="text-align:center">Trasvase · versión 22</p>
     </div>
   </div>
 </div>
@@ -729,6 +735,9 @@ async function cloudInit(retry){
     cloudRef=ref;
     if(snap.exists){
       const d=snap.data()||{};const before=save.unlocked;
+      const lr=+save.infReset||0,cr=+d.infReset||0;
+      if(cr>lr){save.unlocked=1;save.current=1;save.stars={};save.inprog=null;}
+      else if(lr>cr){delete d.unlocked;delete d.stars;delete d.current;delete d.inprog;}
       for(const k in d){
         if(k==='at')continue;
         if(k==='unlocked')save.unlocked=Math.max(save.unlocked,+d.unlocked||1);
@@ -2408,6 +2417,17 @@ function readCode(c){
   const raw=atob(c);const m=/^(\d{1,5})\.([0-3]*)$/.exec(raw);if(!m)throw 0;
   return{u:+m[1],st:m[2]};
 }
+let resetArmed=0;
+$('btnResetInf').onclick=()=>{
+  const b=$('btnResetInf');
+  if(Date.now()-resetArmed>4000){resetArmed=Date.now();b.textContent='¿Seguro? Pulsa otra vez para borrar';$('resetMsg').textContent='';
+    setTimeout(()=>{if(Date.now()-resetArmed>=4000)b.textContent='Reiniciar modo infinito';},4100);return;}
+  resetArmed=0;b.textContent='Reiniciar modo infinito';
+  save.unlocked=1;save.current=1;save.stars={};save.inprog=null;save.infReset=Date.now();
+  persist();if(S.mode==='level')bootLevel();
+  try{renderLevels();}catch(e){}
+  $('resetMsg').textContent='Hecho: el modo infinito vuelve a empezar en el nivel 1';
+};
 $('btnCopyCode').onclick=()=>{
   const code=makeCode(),inp=$('codeIn');
   const fallback=()=>{inp.value=code;inp.focus();inp.select();$('saveMsg').textContent='Mantén pulsado el código para copiarlo';};
