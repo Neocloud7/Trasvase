@@ -546,7 +546,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         <button class="btn ghost small" id="btnCopyCode">Copiar mi código</button>
         <p class="savemsg" id="saveMsg" aria-live="polite"></p>
       </div>
-      <p class="sub" style="text-align:center">Trasvase · versión 19</p>
+      <p class="sub" style="text-align:center">Trasvase · versión 20</p>
     </div>
   </div>
 </div>
@@ -668,15 +668,15 @@ const SAVE_KEY='trasvase-v1';
 const FREE_UNDOS=3,HINT_COST=1,REVEAL_COST=2,TUBE2_COST=3,BOSS_BONUS=3;
 const DROP_SVG='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2.5C9 7 5.5 10.6 5.5 14.6a6.5 6.5 0 0 0 13 0C18.5 10.6 15 7 12 2.5z"/></svg>';
 const MECH={
-  collector:{name:'Coleccionista',intro:8,tip:'Las botellas grandes solo admiten su color: llénalas hasta arriba'},
-  ice:{name:'Congelado',intro:12,tip:'Completa colores para descongelar el hielo'},
-  count:{name:'Contados',intro:17,tip:''},
-  sizes:{name:'Tamaños',intro:22,tip:'Hay tubos de 3 y de 5. Un color se completa con sus 4 capas juntas'},
-  lock:{name:'Candado',intro:27,tip:'Completa el color del candado para abrir ese tubo'},
-  rainbow:{name:'Arcoíris',intro:33,tip:'El arcoíris encaja sobre cualquier color y se disuelve al tocarlo'},
-  tap:{name:'Grifo',intro:38,tip:'Los tubos con grifo vierten desde abajo'},
-  twins:{name:'Gemelas',intro:43,tip:'Al verter de una gemela, la otra también vierte si su color encaja'},
-  giant:{name:'Botella gigante',intro:48,tip:'No hay tubos vacíos: usa la botella gigante para apartar colores y déjala vacía al final'}
+  collector:{name:'Coleccionista',intro:12,tip:'Las botellas grandes solo admiten su color: llénalas hasta arriba'},
+  ice:{name:'Congelado',intro:22,tip:'Completa colores para descongelar el hielo'},
+  count:{name:'Contados',intro:28,tip:''},
+  sizes:{name:'Tamaños',intro:36,tip:'Hay tubos de 3 y de 5. Un color se completa con sus 4 capas juntas'},
+  lock:{name:'Candado',intro:46,tip:'Completa el color del candado para abrir ese tubo'},
+  rainbow:{name:'Arcoíris',intro:57,tip:'El arcoíris encaja sobre cualquier color y se disuelve al tocarlo'},
+  tap:{name:'Grifo',intro:68,tip:'Los tubos con grifo vierten desde abajo'},
+  twins:{name:'Gemelas',intro:78,tip:'Al verter de una gemela, la otra también vierte si su color encaja'},
+  giant:{name:'Botella gigante',intro:92,tip:'No hay tubos vacíos: usa la botella gigante para apartar colores y déjala vacía al final'}
 };
 const MECH_ORDER=['collector','ice','count','sizes','lock','rainbow','tap','twins','giant'];
 let DISPLAY_FONT="'Bagel Fat One','Trebuchet MS',system-ui,sans-serif";
@@ -754,7 +754,9 @@ function worldOf(L){return Math.floor((L-1)/20)%WORLDS.length;}
 function unlockedMechs(L){return MECH_ORDER.filter(m=>MECH[m].intro<=L);}
 function levelSpec(L){
   const boss=isBoss(L),breather=isBreather(L);
-  let colors=Math.min(12,3+Math.floor((L-1)/6));
+  // a gentle ramp: one more colour every few levels at first, then ever more spaced out
+  const STEPS=[1,9,20,34,52,76,105,140,185,240];
+  let colors=2;STEPS.forEach(t=>{if(L>=t)colors++;});colors=Math.min(12,colors);
   if(breather)colors=Math.max(3,colors-1);
   if(boss)colors=Math.min(12,colors+1);
   let mechs=[];
@@ -764,16 +766,17 @@ function levelSpec(L){
   if(L<8||breather)mechs=[];
   else if(intro)mechs=[intro];
   else if(boss){
-    let pick=shuffle(pool.filter(m=>m!=='count'),r).slice(0,2);
+    let pick=shuffle(pool.filter(m=>m!=='count'),r).slice(0,L<70?1:2);
     if(pick.includes('giant')&&pick.includes('collector'))pick=pick.filter(m=>m!=='collector');
-    mechs=pick;if(pool.includes('count')&&r()<.4)mechs.push('count');
+    mechs=pick;if(L>=70&&pool.includes('count')&&r()<.4)mechs.push('count');
   }else{
-    const tot=3+pool.length;let x=r()*tot;
-    if(x>=3)mechs=[pool[Math.min(pool.length-1,Math.floor(x-3))]];
+    // plain levels stay common: roughly half of them until well past level 100
+    const plain=Math.max(3,6-Math.floor(L/40)),tot=plain+pool.length;let x=r()*tot;
+    if(x>=plain)mechs=[pool[Math.min(pool.length-1,Math.floor(x-plain))]];
   }
-  const noHidden=breather||L<31||mechs.some(m=>m==='collector'||m==='tap'||m==='rainbow'||m==='giant');
-  const hiddenP=noHidden?0:Math.min(.5,(L-27)/80);
-  return{L,colors,mechs,boss,breather,hiddenP,seed:L*7919+13,sets:L<40?2:3};
+  const noHidden=breather||L<60||mechs.some(m=>m==='collector'||m==='tap'||m==='rainbow'||m==='giant');
+  const hiddenP=noHidden?0:Math.min(.45,(L-55)/160);
+  return{L,colors,mechs,boss,breather,hiddenP,seed:L*7919+13,sets:L<90?2:3};
 }
 function todayStr(off){const d=new Date();d.setDate(d.getDate()+(off||0));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function dayIndex(){const d=new Date();return Math.floor((Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())-Date.UTC(2026,0,1))/864e5);}
