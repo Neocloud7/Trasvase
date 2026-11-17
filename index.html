@@ -546,7 +546,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         <button class="btn ghost small" id="btnCopyCode">Copiar mi código</button>
         <p class="savemsg" id="saveMsg" aria-live="polite"></p>
       </div>
-      <p class="sub" style="text-align:center">Trasvase · versión 20</p>
+      <p class="sub" style="text-align:center">Trasvase · versión 21</p>
     </div>
   </div>
 </div>
@@ -1054,17 +1054,19 @@ function loadLevel(L,data,mode){
   saveProgress();
   renderHeader();layout();
 }
+/* bump when the level rules change, so boards saved mid-level under old rules are regenerated */
+const LVGEN='g2';
 function bootLevel(){
   const L=Math.min(save.current||1,save.unlocked);
   const ip=save.inprog;
-  if(ip&&ip.key==='L'+L&&ip.data&&ip.data.tubes)loadLevel(L,ip.data,'level');
+  if(ip&&ip.key==='L'+L+LVGEN&&ip.data&&ip.data.tubes)loadLevel(L,ip.data,'level');
   else loadLevel(L,null,'level');
 }
 function saveProgress(){
   if(S.done||S.mode==='zen'||S.mode==='rush'||S.mode==='custom'||S.mode==='story')return;
   const data=JSON.parse(JSON.stringify(levelData()));
   if(S.mode==='daily')save.inprogDaily={day:S.spec.daily,data};
-  else save.inprog={key:'L'+S.level,data};
+  else save.inprog={key:'L'+S.level+LVGEN,data};
   persist();
 }
 
@@ -2215,7 +2217,7 @@ function renderLevels(){
 }
 $('lvGrid').addEventListener('click',e=>{const b=e.target.closest('.lvl');if(!b||b.disabled)return;$('menuOv').hidden=true;$('winOv').hidden=true;RUSH.active=false;
   const L=+b.dataset.l;const ip=save.inprog;
-  if(ip&&ip.key==='L'+L&&ip.data&&ip.data.tubes)loadLevel(L,ip.data,'level');else loadLevel(L,null,'level');});
+  if(ip&&ip.key==='L'+L+LVGEN&&ip.data&&ip.data.tubes)loadLevel(L,ip.data,'level');else loadLevel(L,null,'level');});
 function renderDaily(){
   const sp=dailySpec(),m=sp.mechs[0],doneToday=save.daily.last===todayStr();
   const streakAlive=save.daily.last===todayStr()||save.daily.last===todayStr(-1)||(save.daily.last===todayStr(-2)&&save.shields>0);
